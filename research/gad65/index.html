@@ -1,0 +1,1459 @@
+<!doctype html>
+<html lang="hu">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <meta name="theme-color" content="#06110d">
+  <meta name="description" content="A 375 published GAD65 antibody-associated epilepsy cases interactive, bilingual evidence map.">
+  <title>GAD65-asszociált epilepszia · Interaktív evidenciatérkép</title>
+  <link rel="stylesheet" href="../shared/research.css">
+  <style>
+    :root {
+      --gad-ink: #050806;
+      --gad-night: #07110d;
+      --gad-green: #0b3023;
+      --gad-green-2: #124b36;
+      --gad-venom: #82ff72;
+      --gad-mint: #58e6a3;
+      --gad-silver: #c8d0d1;
+      --gad-silver-2: #92a09e;
+      --gad-line: rgba(192, 211, 204, .20);
+      --gad-paper: #eef4f1;
+      --gad-warn: #f2d58a;
+      --gad-radius: 24px;
+      --gad-shadow: 0 26px 80px rgba(0, 0, 0, .38);
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body.gad-page {
+      margin: 0;
+      min-width: 300px;
+      color: var(--gad-silver);
+      background:
+        radial-gradient(circle at 12% 15%, rgba(23, 98, 68, .22), transparent 34rem),
+        radial-gradient(circle at 88% 35%, rgba(126, 255, 114, .07), transparent 28rem),
+        linear-gradient(145deg, #040705 0%, #07110d 46%, #030504 100%);
+      font: 400 1rem/1.65 Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      overflow-x: hidden;
+    }
+
+    .gad-page button,
+    .gad-page a { font: inherit; }
+    .gad-page a { color: var(--gad-mint); text-underline-offset: .22em; }
+    .gad-page a:hover { color: var(--gad-venom); }
+    .gad-page :focus-visible { outline: 3px solid var(--gad-venom); outline-offset: 4px; }
+    .gad-page .skip-link {
+      position: fixed;
+      z-index: 1000;
+      top: .75rem;
+      left: .75rem;
+      padding: .7rem 1rem;
+      color: var(--gad-ink);
+      background: var(--gad-venom);
+      border-radius: 999px;
+      transform: translateY(-180%);
+    }
+    .gad-page .skip-link:focus { transform: translateY(0); }
+
+    .gad-aurora,
+    .gad-stars {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+    }
+    .gad-aurora {
+      z-index: -2;
+      opacity: .52;
+      background:
+        linear-gradient(115deg, transparent 30%, rgba(55, 229, 150, .05), transparent 62%);
+      animation: gad-breathe 14s ease-in-out infinite alternate;
+    }
+    .gad-stars {
+      z-index: -1;
+      opacity: .32;
+      background-image:
+        radial-gradient(circle, rgba(210, 226, 220, .7) 0 1px, transparent 1.2px),
+        radial-gradient(circle, rgba(130, 255, 114, .55) 0 1px, transparent 1.3px);
+      background-position: 0 0, 22px 28px;
+      background-size: 64px 64px, 91px 91px;
+      mask-image: linear-gradient(to bottom, black, transparent 88%);
+    }
+    @keyframes gad-breathe { to { opacity: .76; transform: scale(1.03) translate3d(1%, -1%, 0); } }
+
+    .gad-topbar {
+      position: sticky;
+      z-index: 50;
+      top: 0;
+      border-bottom: 1px solid var(--gad-line);
+      background: rgba(4, 8, 6, .82);
+      backdrop-filter: blur(18px);
+    }
+    .gad-topbar-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      width: min(1240px, calc(100% - 2rem));
+      min-height: 68px;
+      margin: auto;
+    }
+    .gad-back {
+      display: inline-flex;
+      align-items: center;
+      gap: .65rem;
+      color: var(--gad-paper) !important;
+      text-decoration: none;
+      font-weight: 700;
+    }
+    .gad-back-mark {
+      display: grid;
+      width: 32px;
+      height: 32px;
+      place-items: center;
+      border: 1px solid rgba(130, 255, 114, .38);
+      border-radius: 50%;
+      color: var(--gad-venom);
+      background: rgba(130, 255, 114, .08);
+      transition: transform .25s ease;
+    }
+    .gad-back:hover .gad-back-mark { transform: translateX(-3px); }
+    .gad-top-actions { display: flex; align-items: center; gap: .65rem; }
+    .gad-motion,
+    .gad-lang {
+      border: 1px solid var(--gad-line);
+      color: var(--gad-silver);
+      background: rgba(255, 255, 255, .03);
+      border-radius: 999px;
+      cursor: pointer;
+    }
+    .gad-motion { padding: .52rem .8rem; }
+    .gad-lang { padding: .5rem .72rem; min-width: 42px; font-weight: 800; }
+    .gad-lang[aria-pressed="true"] {
+      color: #071009;
+      border-color: var(--gad-venom);
+      background: var(--gad-venom);
+    }
+
+    .gad-shell { width: min(1180px, calc(100% - 2rem)); margin-inline: auto; }
+    .gad-hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.22fr) minmax(330px, .78fr);
+      gap: clamp(2rem, 6vw, 6rem);
+      align-items: center;
+      min-height: min(820px, calc(100vh - 68px));
+      padding: clamp(5rem, 10vw, 8rem) 0 4.5rem;
+    }
+    .gad-kicker {
+      display: inline-flex;
+      align-items: center;
+      gap: .65rem;
+      margin: 0 0 1.25rem;
+      color: var(--gad-mint);
+      font-size: .78rem;
+      font-weight: 800;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+    }
+    .gad-kicker::before {
+      width: 31px;
+      height: 1px;
+      content: "";
+      background: var(--gad-venom);
+      box-shadow: 0 0 15px var(--gad-venom);
+    }
+    .gad-title {
+      max-width: 18ch;
+      margin: 0;
+      color: var(--gad-paper);
+      font: 500 clamp(2.5rem, 6.4vw, 5.8rem)/.95 Georgia, "Times New Roman", serif;
+      letter-spacing: -.055em;
+      text-wrap: balance;
+    }
+    .gad-title em {
+      color: transparent;
+      font-style: normal;
+      background: linear-gradient(110deg, var(--gad-silver), var(--gad-venom));
+      background-clip: text;
+      -webkit-background-clip: text;
+    }
+    .gad-deck {
+      max-width: 68ch;
+      margin: 1.75rem 0;
+      color: #b9c5c0;
+      font-size: clamp(1.02rem, 1.4vw, 1.2rem);
+    }
+    .gad-authors { margin: 0 0 1.25rem; color: var(--gad-silver-2); }
+    .gad-citation-links { display: flex; flex-wrap: wrap; gap: .65rem; }
+    .gad-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: .45rem;
+      min-height: 42px;
+      padding: .55rem .9rem;
+      border: 1px solid var(--gad-line);
+      border-radius: 999px;
+      color: var(--gad-paper) !important;
+      background: rgba(255, 255, 255, .035);
+      text-decoration: none;
+      transition: border-color .25s ease, background .25s ease, transform .25s ease;
+    }
+    .gad-pill:hover { border-color: rgba(130, 255, 114, .55); background: rgba(130, 255, 114, .08); transform: translateY(-2px); }
+    .gad-warning {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: .85rem;
+      max-width: 68ch;
+      margin-top: 1.5rem;
+      padding: 1rem 1.1rem;
+      border: 1px solid rgba(242, 213, 138, .28);
+      border-radius: 16px;
+      color: #d8d2bd;
+      background: rgba(242, 213, 138, .055);
+      font-size: .91rem;
+    }
+    .gad-warning strong { color: var(--gad-warn); }
+
+    .gad-hero-art {
+      position: relative;
+      display: grid;
+      aspect-ratio: 1;
+      place-items: center;
+      isolation: isolate;
+    }
+    .gad-hero-art::before,
+    .gad-hero-art::after {
+      position: absolute;
+      border-radius: 50%;
+      content: "";
+    }
+    .gad-hero-art::before {
+      inset: 7%;
+      border: 1px solid rgba(130, 255, 114, .24);
+      background: radial-gradient(circle at 45% 42%, rgba(130, 255, 114, .13), rgba(5, 13, 9, .7) 46%, transparent 70%);
+      box-shadow: inset 0 0 50px rgba(130, 255, 114, .08), 0 0 100px rgba(35, 218, 137, .11);
+    }
+    .gad-hero-art::after {
+      inset: 19%;
+      border: 1px dashed rgba(199, 208, 209, .22);
+      animation: gad-spin 28s linear infinite;
+    }
+    @keyframes gad-spin { to { transform: rotate(1turn); } }
+    .gad-neuron {
+      position: relative;
+      z-index: 2;
+      width: 76%;
+      filter: drop-shadow(0 0 18px rgba(130, 255, 114, .25));
+    }
+    .gad-neuron path,
+    .gad-neuron line { vector-effect: non-scaling-stroke; }
+    .gad-orbit-label {
+      position: absolute;
+      z-index: 3;
+      display: grid;
+      width: 74px;
+      height: 74px;
+      place-items: center;
+      border: 1px solid rgba(199, 208, 209, .26);
+      border-radius: 50%;
+      color: var(--gad-paper);
+      background: rgba(5, 12, 8, .84);
+      box-shadow: 0 8px 30px rgba(0, 0, 0, .35);
+      font-size: .73rem;
+      font-weight: 800;
+      text-align: center;
+    }
+    .gad-orbit-label:nth-of-type(1) { top: 5%; right: 19%; }
+    .gad-orbit-label:nth-of-type(2) { right: 1%; bottom: 25%; }
+    .gad-orbit-label:nth-of-type(3) { bottom: 3%; left: 27%; }
+    .gad-orbit-label:nth-of-type(4) { top: 32%; left: 0; }
+
+    .gad-section {
+      position: relative;
+      padding: clamp(4rem, 9vw, 7.5rem) 0;
+      border-top: 1px solid rgba(192, 211, 204, .12);
+      scroll-margin-top: 82px;
+    }
+    .gad-section-head {
+      display: grid;
+      grid-template-columns: minmax(0, .72fr) minmax(0, 1.28fr);
+      gap: 2rem 5rem;
+      align-items: end;
+      margin-bottom: 2.75rem;
+    }
+    .gad-index {
+      color: var(--gad-mint);
+      font-size: .78rem;
+      font-weight: 800;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+    }
+    .gad-h2 {
+      max-width: 17ch;
+      margin: .5rem 0 0;
+      color: var(--gad-paper);
+      font: 500 clamp(2rem, 4vw, 3.9rem)/1.02 Georgia, "Times New Roman", serif;
+      letter-spacing: -.035em;
+      text-wrap: balance;
+    }
+    .gad-lead { max-width: 68ch; margin: 0; color: #aebbb6; font-size: 1.05rem; }
+    .gad-panel {
+      border: 1px solid var(--gad-line);
+      border-radius: var(--gad-radius);
+      background: linear-gradient(145deg, rgba(20, 54, 40, .34), rgba(7, 12, 9, .72));
+      box-shadow: var(--gad-shadow);
+      overflow: hidden;
+    }
+    .gad-panel-pad { padding: clamp(1.25rem, 3vw, 2.2rem); }
+    .gad-note { color: var(--gad-silver-2); font-size: .88rem; }
+    .gad-note strong { color: var(--gad-paper); }
+
+    .gad-stage-tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .65rem;
+      padding: 1.15rem;
+      border-bottom: 1px solid var(--gad-line);
+    }
+    .gad-stage-tab {
+      min-height: 42px;
+      padding: .55rem 1rem;
+      border: 1px solid var(--gad-line);
+      border-radius: 999px;
+      color: var(--gad-silver);
+      background: transparent;
+      cursor: pointer;
+    }
+    .gad-stage-tab[aria-selected="true"] {
+      color: #061009;
+      border-color: var(--gad-venom);
+      background: var(--gad-venom);
+    }
+    .gad-constellation-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.35fr) minmax(245px, .65fr);
+      min-height: 430px;
+    }
+    .gad-dotfield {
+      position: relative;
+      display: grid;
+      grid-template-columns: repeat(25, minmax(3px, 1fr));
+      align-content: center;
+      gap: clamp(3px, .55vw, 7px);
+      min-height: 430px;
+      padding: clamp(1.25rem, 4vw, 3rem);
+      background:
+        radial-gradient(circle at 50% 50%, rgba(66, 230, 158, .12), transparent 58%),
+        linear-gradient(rgba(255,255,255,.016) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.016) 1px, transparent 1px);
+      background-size: auto, 26px 26px, 26px 26px;
+    }
+    .gad-dot {
+      aspect-ratio: 1;
+      border-radius: 50%;
+      background: var(--gad-silver-2);
+      box-shadow: 0 0 9px rgba(199, 208, 209, .18);
+      transform: scale(.72);
+      opacity: .35;
+      transition: opacity .35s ease, transform .35s ease, background .35s ease, box-shadow .35s ease;
+    }
+    .gad-dot.is-lit {
+      background: var(--gad-venom);
+      box-shadow: 0 0 10px rgba(130, 255, 114, .62);
+      transform: scale(1);
+      opacity: .82;
+    }
+    .gad-stage-copy {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 2rem;
+      border-left: 1px solid var(--gad-line);
+      background: rgba(0, 0, 0, .18);
+    }
+    .gad-stage-number {
+      color: var(--gad-paper);
+      font: 500 clamp(3.5rem, 8vw, 7rem)/.9 Georgia, serif;
+      letter-spacing: -.06em;
+    }
+    .gad-stage-label { margin: 1rem 0 .7rem; color: var(--gad-mint); font-weight: 800; }
+    .gad-stage-detail { margin: 0; color: #aebbb6; }
+
+    .gad-atlas {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: .8rem;
+    }
+    .gad-atlas-button {
+      position: relative;
+      min-height: 155px;
+      padding: 1.2rem;
+      overflow: hidden;
+      border: 1px solid var(--gad-line);
+      border-radius: 18px;
+      color: var(--gad-silver);
+      background: rgba(255, 255, 255, .025);
+      text-align: left;
+      cursor: pointer;
+      transition: border-color .25s ease, transform .25s ease, background .25s ease;
+    }
+    .gad-atlas-button::after {
+      position: absolute;
+      right: -28px;
+      bottom: -35px;
+      width: 105px;
+      height: 105px;
+      border: 1px solid rgba(130, 255, 114, .18);
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(130, 255, 114, .1), transparent 64%);
+      content: "";
+    }
+    .gad-atlas-button:hover,
+    .gad-atlas-button[aria-pressed="true"] {
+      border-color: rgba(130, 255, 114, .6);
+      background: rgba(130, 255, 114, .06);
+      transform: translateY(-3px);
+    }
+    .gad-atlas-value { display: block; color: var(--gad-paper); font: 500 2rem/1 Georgia, serif; }
+    .gad-atlas-name { display: block; margin-top: .65rem; color: var(--gad-mint); font-weight: 750; }
+    .gad-atlas-denom { display: block; margin-top: .35rem; color: var(--gad-silver-2); font-size: .78rem; }
+    .gad-atlas-detail {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 1rem;
+      align-items: center;
+      margin-top: 1rem;
+      padding: 1.2rem 1.4rem;
+      border: 1px solid rgba(130, 255, 114, .2);
+      border-radius: 18px;
+      background: rgba(11, 48, 35, .34);
+    }
+    .gad-atlas-detail strong { color: var(--gad-venom); font: 500 2.1rem/1 Georgia, serif; }
+
+    .gad-timing-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+    .gad-time-card {
+      position: relative;
+      padding: 1.45rem;
+      border: 1px solid var(--gad-line);
+      border-radius: 20px;
+      background: rgba(255, 255, 255, .025);
+    }
+    .gad-time-card::before {
+      display: block;
+      width: 12px;
+      height: 12px;
+      margin-bottom: 1.1rem;
+      border: 2px solid var(--gad-night);
+      border-radius: 50%;
+      background: var(--gad-venom);
+      box-shadow: 0 0 0 5px rgba(130, 255, 114, .12), 0 0 24px rgba(130, 255, 114, .35);
+      content: "";
+    }
+    .gad-time-card.is-muted::before { background: var(--gad-silver-2); box-shadow: 0 0 0 5px rgba(199,208,209,.08); }
+    .gad-time-card h3 { margin: 0 0 .4rem; color: var(--gad-paper); font-size: 1.05rem; }
+    .gad-time-card b { color: var(--gad-venom); font: 500 2.2rem/1 Georgia, serif; }
+    .gad-time-card p { margin: .65rem 0 0; color: var(--gad-silver-2); font-size: .88rem; }
+    .gad-timing-context {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1px;
+      border: 1px solid var(--gad-line);
+      border-radius: 18px;
+      overflow: hidden;
+      background: var(--gad-line);
+    }
+    .gad-timing-context div { padding: 1.15rem; background: #09120e; }
+    .gad-timing-context strong { display: block; color: var(--gad-paper); font-size: 1.2rem; }
+
+    .gad-regimens {
+      display: grid;
+      grid-template-columns: minmax(240px, .7fr) minmax(0, 1.3fr);
+      gap: 2rem;
+      align-items: center;
+      margin-top: 2rem;
+    }
+    .gad-ring {
+      position: relative;
+      display: grid;
+      aspect-ratio: 1;
+      width: min(100%, 300px);
+      place-items: center;
+      margin: auto;
+      border-radius: 50%;
+      background: conic-gradient(var(--gad-venom) 0 51%, #7c8b87 51% 69.1%, #476a5e 69.1% 79.9%, #2ea476 79.9% 87.7%, #a7b2b0 87.7% 95.1%, #1b5943 95.1% 98.5%, #303a37 98.5%);
+      box-shadow: 0 0 55px rgba(87, 230, 163, .15);
+    }
+    .gad-ring::before {
+      position: absolute;
+      inset: 22%;
+      border-radius: 50%;
+      background: #07100c;
+      box-shadow: inset 0 0 30px rgba(0,0,0,.5);
+      content: "";
+    }
+    .gad-ring span { position: relative; text-align: center; color: var(--gad-silver-2); font-size: .78rem; }
+    .gad-ring strong { display: block; color: var(--gad-paper); font: 500 3.2rem/1 Georgia, serif; }
+    .gad-legend { display: grid; gap: .65rem; }
+    .gad-legend-row {
+      display: grid;
+      grid-template-columns: 12px minmax(0, 1fr) auto;
+      gap: .75rem;
+      align-items: center;
+    }
+    .gad-legend-row i { width: 10px; height: 10px; border-radius: 50%; background: var(--swatch); box-shadow: 0 0 8px color-mix(in srgb, var(--swatch), transparent 55%); }
+    .gad-legend-row span { color: #b8c3bf; }
+    .gad-legend-row b { color: var(--gad-paper); }
+
+    .gad-forest-wrap { padding: clamp(1rem, 3vw, 2rem); }
+    .gad-forest-head,
+    .gad-forest-row {
+      display: grid;
+      grid-template-columns: minmax(185px, .9fr) minmax(260px, 1.5fr) minmax(145px, .72fr);
+      gap: 1.2rem;
+      align-items: center;
+    }
+    .gad-forest-head {
+      padding: 0 .7rem .8rem;
+      color: var(--gad-silver-2);
+      font-size: .75rem;
+      font-weight: 800;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+    .gad-forest-row {
+      min-height: 78px;
+      padding: .75rem;
+      border-top: 1px solid rgba(192, 211, 204, .1);
+      border-radius: 12px;
+      cursor: pointer;
+    }
+    .gad-forest-row:hover,
+    .gad-forest-row:focus-within { background: rgba(130, 255, 114, .045); }
+    .gad-forest-name {
+      border: 0;
+      color: var(--gad-paper);
+      background: transparent;
+      font-weight: 750;
+      text-align: left;
+      cursor: pointer;
+    }
+    .gad-forest-chart {
+      position: relative;
+      height: 38px;
+      background:
+        linear-gradient(90deg, transparent calc(21.739% - .5px), rgba(242, 213, 138, .65) calc(21.739% - .5px) calc(21.739% + .5px), transparent calc(21.739% + .5px)),
+        linear-gradient(90deg, rgba(255,255,255,.04) 1px, transparent 1px);
+      background-size: auto, 21.739% 100%;
+    }
+    .gad-ci {
+      position: absolute;
+      top: 18px;
+      left: var(--lo);
+      width: calc(var(--hi) - var(--lo));
+      height: 2px;
+      background: var(--gad-silver);
+      box-shadow: 0 0 6px rgba(199,208,209,.2);
+    }
+    .gad-ci::before,
+    .gad-ci::after {
+      position: absolute;
+      top: -4px;
+      width: 1px;
+      height: 10px;
+      background: var(--gad-silver);
+      content: "";
+    }
+    .gad-ci::before { left: 0; }
+    .gad-ci::after { right: 0; }
+    .gad-rd {
+      position: absolute;
+      z-index: 2;
+      top: 12px;
+      left: var(--rd);
+      width: 14px;
+      height: 14px;
+      border: 2px solid #07100c;
+      border-radius: 50%;
+      background: var(--gad-venom);
+      box-shadow: 0 0 0 2px rgba(130, 255, 114, .28), 0 0 15px rgba(130, 255, 114, .45);
+      transform: translateX(-50%);
+    }
+    .gad-forest-values { color: var(--gad-silver-2); font-size: .8rem; }
+    .gad-forest-values b { display: block; color: var(--gad-paper); font-size: .9rem; }
+    .gad-axis {
+      display: grid;
+      grid-template-columns: minmax(185px, .9fr) minmax(260px, 1.5fr) minmax(145px, .72fr);
+      gap: 1.2rem;
+      padding: .15rem .7rem 0;
+    }
+    .gad-axis-scale {
+      display: flex;
+      justify-content: space-between;
+      color: var(--gad-silver-2);
+      font-size: .7rem;
+    }
+    .gad-forest-detail {
+      margin: 1rem 0 0;
+      padding: 1rem 1.15rem;
+      border: 1px solid rgba(130, 255, 114, .18);
+      border-radius: 14px;
+      color: #b9c4c0;
+      background: rgba(130, 255, 114, .035);
+    }
+    .gad-forest-detail strong { color: var(--gad-venom); }
+    .gad-followup {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: .75rem;
+      margin-top: 1rem;
+    }
+    .gad-followup article {
+      padding: 1rem;
+      border: 1px solid rgba(192, 211, 204, .14);
+      border-radius: 14px;
+      background: rgba(255, 255, 255, .018);
+    }
+    .gad-followup h3 { margin: 0 0 .45rem; color: var(--gad-paper); font-size: .84rem; }
+    .gad-followup b { display: block; color: var(--gad-mint); }
+    .gad-followup span { color: var(--gad-silver-2); font-size: .76rem; }
+
+    .gad-duration-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+    .gad-duration-card { padding: 1.4rem; }
+    .gad-duration-card h3 { margin: 0 0 1.4rem; color: var(--gad-paper); }
+    .gad-river { display: grid; gap: 1.1rem; }
+    .gad-river-row { display: grid; grid-template-columns: 100px 1fr auto; gap: .8rem; align-items: center; }
+    .gad-river-row span { font-size: .85rem; }
+    .gad-river-track { height: 9px; overflow: hidden; border-radius: 99px; background: rgba(255,255,255,.08); }
+    .gad-river-fill { height: 100%; width: var(--w); border-radius: inherit; background: linear-gradient(90deg, var(--gad-green-2), var(--gad-venom)); box-shadow: 0 0 12px rgba(130,255,114,.28); }
+    .gad-river-row b { min-width: 3.5rem; color: var(--gad-paper); text-align: right; }
+
+    .gad-network {
+      position: relative;
+      min-height: 590px;
+      background:
+        radial-gradient(circle at 50% 50%, rgba(130, 255, 114, .11), transparent 33%),
+        radial-gradient(circle at 50% 50%, transparent 0 29%, rgba(199, 208, 209, .12) 29.2% 29.5%, transparent 29.7% 43%, rgba(130,255,114,.1) 43.2% 43.5%, transparent 43.7%);
+    }
+    .gad-network::before,
+    .gad-network::after {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 62%;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(130,255,114,.28), transparent);
+      content: "";
+      transform: translate(-50%, -50%) rotate(27deg);
+    }
+    .gad-network::after { transform: translate(-50%, -50%) rotate(-38deg); }
+    .gad-core,
+    .gad-node {
+      position: absolute;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      text-align: center;
+    }
+    .gad-core {
+      z-index: 3;
+      top: 50%;
+      left: 50%;
+      width: 145px;
+      height: 145px;
+      border: 1px solid rgba(130,255,114,.65);
+      color: var(--gad-paper);
+      background: radial-gradient(circle, #164a36, #08130e 70%);
+      box-shadow: 0 0 0 14px rgba(130,255,114,.035), 0 0 60px rgba(66,223,150,.25);
+      transform: translate(-50%, -50%);
+    }
+    .gad-core strong { display: block; font: 500 2.2rem/1 Georgia, serif; }
+    .gad-core span { color: var(--gad-mint); font-size: .75rem; }
+    .gad-node {
+      z-index: 4;
+      width: 102px;
+      height: 102px;
+      padding: .45rem;
+      border: 1px solid var(--gad-line);
+      color: var(--gad-silver);
+      background: rgba(5, 12, 8, .92);
+      box-shadow: 0 12px 30px rgba(0,0,0,.35);
+      cursor: pointer;
+      transition: transform .25s ease, border-color .25s ease, background .25s ease;
+    }
+    .gad-node:hover,
+    .gad-node[aria-pressed="true"] { z-index: 5; border-color: var(--gad-venom); background: #0d2c20; transform: scale(1.07); }
+    .gad-node b { display: block; color: var(--gad-venom); font: 500 1.55rem/1 Georgia, serif; }
+    .gad-node small { display: block; margin-top: .34rem; line-height: 1.15; }
+    .gad-node:nth-of-type(1) { top: 7%; left: calc(50% - 51px); }
+    .gad-node:nth-of-type(2) { top: 19%; right: 13%; }
+    .gad-node:nth-of-type(3) { right: 8%; bottom: 18%; }
+    .gad-node:nth-of-type(4) { right: calc(50% - 51px); bottom: 5%; }
+    .gad-node:nth-of-type(5) { bottom: 18%; left: 8%; }
+    .gad-node:nth-of-type(6) { top: 19%; left: 13%; }
+    .gad-node:nth-of-type(7) { top: 48%; right: 1.5%; }
+    .gad-network-detail {
+      position: absolute;
+      z-index: 6;
+      right: 1.25rem;
+      bottom: 1.25rem;
+      left: 1.25rem;
+      margin: 0;
+      padding: .8rem 1rem;
+      border: 1px solid rgba(130,255,114,.2);
+      border-radius: 12px;
+      color: #b6c0bc;
+      background: rgba(4, 9, 6, .86);
+      backdrop-filter: blur(10px);
+    }
+
+    .gad-limit-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+    }
+    .gad-limit {
+      min-height: 190px;
+      padding: 1.4rem;
+      border: 1px solid var(--gad-line);
+      border-radius: 18px;
+      background: linear-gradient(145deg, rgba(255,255,255,.035), rgba(0,0,0,.12));
+    }
+    .gad-limit-icon {
+      display: grid;
+      width: 38px;
+      height: 38px;
+      margin-bottom: 1rem;
+      place-items: center;
+      border: 1px solid rgba(242,213,138,.3);
+      border-radius: 50%;
+      color: var(--gad-warn);
+      background: rgba(242,213,138,.06);
+    }
+    .gad-limit h3 { margin: 0 0 .6rem; color: var(--gad-paper); font-size: 1rem; }
+    .gad-limit p { margin: 0; color: var(--gad-silver-2); font-size: .9rem; }
+
+    .gad-source-grid {
+      display: grid;
+      grid-template-columns: 1.15fr .85fr;
+      gap: 1rem;
+    }
+    .gad-source-card { padding: clamp(1.4rem, 3vw, 2rem); }
+    .gad-source-card h3 { margin: 0 0 1rem; color: var(--gad-paper); }
+    .gad-source-card p { color: #acb9b4; }
+    .gad-source-links { display: flex; flex-wrap: wrap; gap: .6rem; }
+    .gad-citation {
+      padding-left: 1.1rem;
+      border-left: 2px solid var(--gad-venom);
+      color: #b7c2bd;
+    }
+    .gad-footer {
+      display: flex;
+      justify-content: space-between;
+      gap: 1rem;
+      padding: 2.5rem 0 3.5rem;
+      border-top: 1px solid var(--gad-line);
+      color: var(--gad-silver-2);
+      font-size: .85rem;
+    }
+    .gad-sr-only {
+      position: absolute !important;
+      width: 1px !important;
+      height: 1px !important;
+      padding: 0 !important;
+      overflow: hidden !important;
+      clip: rect(0, 0, 0, 0) !important;
+      white-space: nowrap !important;
+      border: 0 !important;
+    }
+
+    @media (max-width: 940px) {
+      .gad-hero { grid-template-columns: 1fr; min-height: auto; }
+      .gad-hero-art { width: min(620px, 100%); margin: auto; }
+      .gad-section-head { grid-template-columns: 1fr; }
+      .gad-atlas { grid-template-columns: repeat(2, 1fr); }
+      .gad-constellation-layout { grid-template-columns: 1fr; }
+      .gad-stage-copy { border-top: 1px solid var(--gad-line); border-left: 0; }
+      .gad-regimens,
+      .gad-source-grid { grid-template-columns: 1fr; }
+      .gad-followup { grid-template-columns: repeat(2, 1fr); }
+      .gad-limit-grid { grid-template-columns: repeat(2, 1fr); }
+      .gad-forest-head,
+      .gad-forest-row,
+      .gad-axis { grid-template-columns: 170px minmax(230px, 1fr) 140px; }
+      .gad-forest-wrap { overflow-x: auto; }
+      .gad-forest { min-width: 760px; }
+    }
+    @media (max-width: 680px) {
+      .gad-shell,
+      .gad-topbar-inner { width: min(100% - 1.2rem, 1180px); }
+      .gad-back-label,
+      .gad-motion-label { display: none; }
+      .gad-motion { width: 42px; padding-inline: 0; }
+      .gad-hero { gap: 2rem; padding-top: 4rem; }
+      .gad-title { font-size: clamp(2.35rem, 12.5vw, 4rem); }
+      .gad-orbit-label { width: 60px; height: 60px; font-size: .64rem; }
+      .gad-atlas { grid-template-columns: 1fr 1fr; }
+      .gad-atlas-button { min-height: 145px; padding: 1rem; }
+      .gad-timing-grid,
+      .gad-timing-context,
+      .gad-duration-grid,
+      .gad-limit-grid,
+      .gad-followup { grid-template-columns: 1fr; }
+      .gad-network { min-height: 720px; background: radial-gradient(circle at 50% 44%, rgba(130,255,114,.11), transparent 23%); }
+      .gad-core { top: 44%; width: 122px; height: 122px; }
+      .gad-node { width: 90px; height: 90px; }
+      .gad-node:nth-of-type(1) { top: 3%; left: 8%; }
+      .gad-node:nth-of-type(2) { top: 3%; right: 8%; }
+      .gad-node:nth-of-type(3) { top: 20%; right: 1%; bottom: auto; }
+      .gad-node:nth-of-type(4) { right: 5%; bottom: 19%; }
+      .gad-node:nth-of-type(5) { bottom: 19%; left: 5%; }
+      .gad-node:nth-of-type(6) { top: 20%; left: 1%; }
+      .gad-node:nth-of-type(7) { top: auto; right: calc(50% - 45px); bottom: 4%; }
+      .gad-network-detail { bottom: 31%; font-size: .82rem; }
+      .gad-footer { flex-direction: column; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      .gad-aurora,
+      .gad-hero-art::after { animation: none !important; }
+      *, *::before, *::after { transition-duration: .01ms !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; }
+    }
+    body.gad-motion-off .gad-aurora,
+    body.gad-motion-off .gad-hero-art::after { animation-play-state: paused !important; }
+  </style>
+</head>
+<body class="gad-page" data-title-hu="GAD65-asszociált epilepszia · Interaktív evidenciatérkép" data-title-en="GAD65 antibody-associated epilepsy · Interactive evidence map">
+  <a class="skip-link" href="#main" data-hu="Ugrás a tartalomhoz" data-en="Skip to content">Ugrás a tartalomhoz</a>
+  <div class="gad-aurora" aria-hidden="true"></div>
+  <div class="gad-stars" aria-hidden="true"></div>
+
+  <header class="gad-topbar">
+    <div class="gad-topbar-inner">
+      <a class="gad-back" href="../../" aria-label="Vissza a profilomhoz" data-aria-hu="Vissza a profilomhoz" data-aria-en="Back to my profile">
+        <span class="gad-back-mark" aria-hidden="true">←</span>
+        <span class="gad-back-label" data-hu="Vissza a profilomhoz" data-en="Back to my profile">Vissza a profilomhoz</span>
+      </a>
+      <div class="gad-top-actions">
+        <button class="gad-motion" type="button" data-motion aria-pressed="false" title="Mozgás szüneteltetése">
+          <span aria-hidden="true">◌</span>
+          <span class="gad-motion-label" data-hu="Mozgás" data-en="Motion">Mozgás</span>
+        </button>
+        <button class="gad-lang" type="button" data-lang="hu" aria-pressed="true">HU</button>
+        <button class="gad-lang" type="button" data-lang="en" aria-pressed="false">EN</button>
+      </div>
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="gad-shell gad-hero" aria-labelledby="page-title">
+      <div>
+        <p class="gad-kicker" data-hu="Publikált esetekből épített evidenciatérkép" data-en="Evidence map built from published cases">Publikált esetekből épített evidenciatérkép</p>
+        <h1 class="gad-title" id="page-title">
+          <span data-hu="Időzítés, összetétel és válasz" data-en="Timing, composition, and response">Időzítés, összetétel és válasz</span>
+          <em>GAD65</em>
+        </h1>
+        <p class="gad-deck" data-hu="A szakirodalomban közölt 375 egyedi eset interaktív, betegszintű áttekintése. A mintázatok azt jelzik, hogy az immunterápia időzítésének összefüggése kezelési osztályonként eltérhet — ez feltáró, hipotézisalkotó eredmény, nem okozati bizonyíték." data-en="An interactive patient-level view of 375 unique cases reported in the literature. The patterns suggest that the association with immunotherapy timing may differ by treatment class—an exploratory, hypothesis-generating finding, not causal evidence.">A szakirodalomban közölt 375 egyedi eset interaktív, betegszintű áttekintése. A mintázatok azt jelzik, hogy az immunterápia időzítésének összefüggése kezelési osztályonként eltérhet — ez feltáró, hipotézisalkotó eredmény, nem okozati bizonyíték.</p>
+        <p class="gad-authors">Janszky J Jr · Janszky J · Horváth R · <span>Neurology International 2026;18(6):121</span></p>
+        <div class="gad-citation-links" role="navigation" aria-label="Publikációs linkek" data-aria-hu="Publikációs linkek" data-aria-en="Publication links">
+          <a class="gad-pill" href="https://doi.org/10.3390/neurolint18060121" target="_blank" rel="noopener">DOI ↗</a>
+          <a class="gad-pill" href="https://www.mdpi.com/2035-8377/18/6/121" target="_blank" rel="noopener" data-hu="Teljes cikk ↗" data-en="Full article ↗">Teljes cikk ↗</a>
+          <a class="gad-pill" href="https://pubmed.ncbi.nlm.nih.gov/42347129/" target="_blank" rel="noopener">PubMed ↗</a>
+          <a class="gad-pill" href="https://m2.mtmt.hu/gui2/?mode=browse&amp;params=publication;37346990" target="_blank" rel="noopener">MTMT ↗</a>
+        </div>
+        <div class="gad-warning" role="note">
+          <strong aria-hidden="true">!</strong>
+          <span data-hu="Ez az oldal egy megjelent, szakirodalomból összeállított elemzés interaktív összefoglalója. Nem diagnosztikai vagy kezelési útmutató. A bemutatott különbségek nem igazolják egyik kezelés okozati előnyét vagy fölényét." data-en="This page is an interactive summary of a published, literature-derived analysis. It is not diagnostic or treatment guidance. The displayed differences do not establish a causal benefit or superiority of any treatment.">Ez az oldal egy megjelent, szakirodalomból összeállított elemzés interaktív összefoglalója. Nem diagnosztikai vagy kezelési útmutató. A bemutatott különbségek nem igazolják egyik kezelés okozati előnyét vagy fölényét.</span>
+        </div>
+      </div>
+
+      <div class="gad-hero-art" aria-hidden="true">
+        <svg class="gad-neuron" viewBox="0 0 500 500" fill="none">
+          <defs>
+            <radialGradient id="g-core">
+              <stop stop-color="#dfffe8"/>
+              <stop offset=".38" stop-color="#82ff72"/>
+              <stop offset="1" stop-color="#134b36"/>
+            </radialGradient>
+            <linearGradient id="g-line" x1="40" y1="40" x2="470" y2="470">
+              <stop stop-color="#c8d0d1" stop-opacity=".25"/>
+              <stop offset=".5" stop-color="#82ff72"/>
+              <stop offset="1" stop-color="#58e6a3" stop-opacity=".18"/>
+            </linearGradient>
+          </defs>
+          <g stroke="url(#g-line)" stroke-width="1.4">
+            <path d="M250 250C181 214 142 142 108 64M188 221C119 211 74 178 26 143M176 279C114 307 70 352 34 419M241 316C221 374 222 427 208 482M310 277C360 315 405 319 477 355M319 228C374 184 407 146 468 91M285 184C300 130 289 76 310 20"/>
+            <path d="M108 64L68 34M108 64L117 15M108 64L52 82M26 143L4 112M26 143L2 172M34 419L4 443M34 419L19 376M208 482L176 498M208 482L243 500M477 355L499 330M477 355L496 390M468 91L497 77M468 91L474 48M310 20L290 0M310 20L347 0"/>
+          </g>
+          <circle cx="250" cy="250" r="77" stroke="#c8d0d1" stroke-opacity=".38"/>
+          <circle cx="250" cy="250" r="58" fill="url(#g-core)" fill-opacity=".88"/>
+          <circle cx="250" cy="250" r="9" fill="#f0fff4"/>
+          <g fill="#82ff72">
+            <circle cx="108" cy="64" r="5"/><circle cx="26" cy="143" r="4"/><circle cx="34" cy="419" r="5"/>
+            <circle cx="208" cy="482" r="4"/><circle cx="477" cy="355" r="5"/><circle cx="468" cy="91" r="4"/><circle cx="310" cy="20" r="4"/>
+          </g>
+          <g fill="#c8d0d1" fill-opacity=".6">
+            <circle cx="188" cy="221" r="3"/><circle cx="176" cy="279" r="3"/><circle cx="241" cy="316" r="3"/>
+            <circle cx="310" cy="277" r="3"/><circle cx="319" cy="228" r="3"/><circle cx="285" cy="184" r="3"/>
+          </g>
+        </svg>
+        <span class="gad-orbit-label">166<br><span data-hu="teljes szöveg" data-en="full texts">teljes szöveg</span></span>
+        <span class="gad-orbit-label">132<br><span data-hu="forrás" data-en="sources">forrás</span></span>
+        <span class="gad-orbit-label">375<br><span data-hu="eset" data-en="cases">eset</span></span>
+        <span class="gad-orbit-label">95<br><span data-hu="hosszú táv" data-en="long term">hosszú táv</span></span>
+      </div>
+    </section>
+
+    <section class="gad-section" id="evidence" aria-labelledby="evidence-title">
+      <div class="gad-shell">
+        <div class="gad-section-head">
+          <div>
+            <span class="gad-index">01 · <span data-hu="Evidencia-konstelláció" data-en="Evidence constellation">Evidencia-konstelláció</span></span>
+            <h2 class="gad-h2" id="evidence-title" data-hu="A közleménytől az egyedi esetig" data-en="From publication to unique case">A közleménytől az egyedi esetig</h2>
+          </div>
+          <p class="gad-lead" data-hu="A pontmező a feldolgozás három rétegét jeleníti meg. Válts a lépések között: a 166 auditált teljes szövegből 132 adott betegszintű adatot, amelyek 375 egyedi esetet írtak le." data-en="The dot field shows three layers of evidence processing. Move between stages: of 166 audited full texts, 132 contributed patient-level data describing 375 unique cases.">A pontmező a feldolgozás három rétegét jeleníti meg. Válts a lépések között: a 166 auditált teljes szövegből 132 adott betegszintű adatot, amelyek 375 egyedi esetet írtak le.</p>
+        </div>
+
+        <div class="gad-panel">
+          <div class="gad-stage-tabs" role="tablist" aria-label="Evidenciaszintek" data-aria-hu="Evidenciaszintek" data-aria-en="Evidence stages">
+            <button class="gad-stage-tab" type="button" role="tab" aria-controls="stage-panel" aria-selected="true" data-stage="166" data-stage-key="full" data-hu="166 auditált teljes szöveg" data-en="166 audited full texts">166 auditált teljes szöveg</button>
+            <button class="gad-stage-tab" type="button" role="tab" aria-controls="stage-panel" aria-selected="false" data-stage="132" data-stage-key="sources" data-hu="132 adatot adó forrás" data-en="132 contributing sources">132 adatot adó forrás</button>
+            <button class="gad-stage-tab" type="button" role="tab" aria-controls="stage-panel" aria-selected="false" data-stage="375" data-stage-key="cases" data-hu="375 egyedi eset" data-en="375 unique cases">375 egyedi eset</button>
+          </div>
+          <div class="gad-constellation-layout" id="stage-panel" role="tabpanel">
+            <div class="gad-dotfield" data-dotfield aria-hidden="true"></div>
+            <div class="gad-stage-copy" aria-live="polite">
+              <span class="gad-stage-number" data-stage-number>166</span>
+              <p class="gad-stage-label" data-stage-label>auditált teljes szöveg</p>
+              <p class="gad-stage-detail" data-stage-detail>1988 és 2026 között megjelent források; a keresés 2025. május 1. és 2026. április 1. között zajlott.</p>
+            </div>
+          </div>
+        </div>
+        <p class="gad-note"><strong>95 / 53:</strong> <span data-hu="a hosszú távú bináris kimenetel elemzéséhez 95 beteg 53 közleményből adott megfelelő adatot." data-en="95 patients from 53 publications contributed adequate data to the long-term binary-outcome analysis.">a hosszú távú bináris kimenetel elemzéséhez 95 beteg 53 közleményből adott megfelelő adatot.</span></p>
+      </div>
+    </section>
+
+    <section class="gad-section" id="phenotype" aria-labelledby="phenotype-title">
+      <div class="gad-shell">
+        <div class="gad-section-head">
+          <div>
+            <span class="gad-index">02 · <span data-hu="Fenotípus-atlasz" data-en="Phenotype atlas">Fenotípus-atlasz</span></span>
+            <h2 class="gad-h2" id="phenotype-title" data-hu="Egy heterogén populáció körvonalai" data-en="The contours of a heterogeneous population">Egy heterogén populáció körvonalai</h2>
+          </div>
+          <p class="gad-lead" data-hu="A publikált esetek változónként eltérő mennyiségű információt tartalmaztak. Kattints egy mezőre az értelmezéshez; a nevező mindenhol látható, ahol rendelkezésre állt." data-en="Published cases contained different amounts of information for each variable. Select a tile for context; the denominator is shown wherever available.">A publikált esetek változónként eltérő mennyiségű információt tartalmaztak. Kattints egy mezőre az értelmezéshez; a nevező mindenhol látható, ahol rendelkezésre állt.</p>
+        </div>
+
+        <div class="gad-atlas" role="group" aria-label="Fenotípusmutatók" data-aria-hu="Fenotípusmutatók" data-aria-en="Phenotype metrics">
+          <button class="gad-atlas-button" type="button" aria-pressed="true" data-atlas="women">
+            <span class="gad-atlas-value">72,9%</span>
+            <span class="gad-atlas-name" data-hu="nő" data-en="women">nő</span>
+            <span class="gad-atlas-denom">253 / 347</span>
+          </button>
+          <button class="gad-atlas-button" type="button" aria-pressed="false" data-atlas="onset">
+            <span class="gad-atlas-value">25 <small data-hu="év" data-en="years">év</small></span>
+            <span class="gad-atlas-name" data-hu="átlagos kezdet" data-en="mean onset">átlagos kezdet</span>
+            <span class="gad-atlas-denom" data-hu="tartomány: 1–80 év" data-en="range: 1–80 years">tartomány: 1–80 év</span>
+          </button>
+          <button class="gad-atlas-button" type="button" aria-pressed="false" data-atlas="dre">
+            <span class="gad-atlas-value">85,2%</span>
+            <span class="gad-atlas-name" data-hu="gyógyszerrezisztens" data-en="drug-resistant">gyógyszerrezisztens</span>
+            <span class="gad-atlas-denom">179 / 210</span>
+          </button>
+          <button class="gad-atlas-button" type="button" aria-pressed="false" data-atlas="tle">
+            <span class="gad-atlas-value">59,5%</span>
+            <span class="gad-atlas-name" data-hu="definitív TLE" data-en="definite TLE">definitív TLE</span>
+            <span class="gad-atlas-denom">223 / 375</span>
+          </button>
+          <button class="gad-atlas-button" type="button" aria-pressed="false" data-atlas="unilateral">
+            <span class="gad-atlas-value">99</span>
+            <span class="gad-atlas-name" data-hu="egyoldali TLE" data-en="unilateral TLE">egyoldali TLE</span>
+            <span class="gad-atlas-denom" data-hu="közölt eset" data-en="reported cases">közölt eset</span>
+          </button>
+          <button class="gad-atlas-button" type="button" aria-pressed="false" data-atlas="bilateral">
+            <span class="gad-atlas-value">63</span>
+            <span class="gad-atlas-name" data-hu="kétoldali temporális MRI" data-en="bilateral temporal MRI">kétoldali temporális MRI</span>
+            <span class="gad-atlas-denom" data-hu="közölt eset" data-en="reported cases">közölt eset</span>
+          </button>
+          <button class="gad-atlas-button" type="button" aria-pressed="false" data-atlas="multifocal">
+            <span class="gad-atlas-value">65</span>
+            <span class="gad-atlas-name" data-hu="multifokális" data-en="multifocal">multifokális</span>
+            <span class="gad-atlas-denom" data-hu="közölt eset" data-en="reported cases">közölt eset</span>
+          </button>
+          <button class="gad-atlas-button" type="button" aria-pressed="false" data-atlas="mri">
+            <span class="gad-atlas-value">99</span>
+            <span class="gad-atlas-name" data-hu="MRI-negatív" data-en="MRI-negative">MRI-negatív</span>
+            <span class="gad-atlas-denom" data-hu="közölt eset" data-en="reported cases">közölt eset</span>
+          </button>
+        </div>
+        <div class="gad-atlas-detail" aria-live="polite">
+          <strong data-atlas-big>253/347</strong>
+          <span data-atlas-copy>A rendelkezésre álló nemi adat alapján a publikált esetek 72,9%-a nő volt.</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="gad-section" id="timing" aria-labelledby="timing-title">
+      <div class="gad-shell">
+        <div class="gad-section-head">
+          <div>
+            <span class="gad-index">03 · <span data-hu="Időzítési pálya" data-en="Timing track">Időzítési pálya</span></span>
+            <h2 class="gad-h2" id="timing-title" data-hu="A kezdet és az immunterápia között" data-en="Between onset and immunotherapy">A kezdet és az immunterápia között</h2>
+          </div>
+          <p class="gad-lead" data-hu="A kezelt 248 eset közül csak 113-nál volt ismert az időzítés. Az elsődleges összehasonlítás a korai (≤6 hónap) és a késői (&gt;12 hónap) csoport 109 esetét használta; a négy köztes eset kimaradt." data-en="Timing was known for only 113 of 248 treated cases. The primary comparison used 109 cases in the early (≤6 months) and late (&gt;12 months) groups; four intermediate cases were excluded.">A kezelt 248 eset közül csak 113-nál volt ismert az időzítés. Az elsődleges összehasonlítás a korai (≤6 hónap) és a késői (&gt;12 hónap) csoport 109 esetét használta; a négy köztes eset kimaradt.</p>
+        </div>
+
+        <div class="gad-panel gad-panel-pad">
+          <div class="gad-timing-grid">
+            <article class="gad-time-card">
+              <h3 data-hu="Korai" data-en="Early">Korai</h3>
+              <b>70</b>
+              <p data-hu="kezelés a kezdetet követő legfeljebb 6 hónapon belül" data-en="treated within 6 months of onset">kezelés a kezdetet követő legfeljebb 6 hónapon belül</p>
+            </article>
+            <article class="gad-time-card is-muted">
+              <h3 data-hu="Köztes" data-en="Intermediate">Köztes</h3>
+              <b>4</b>
+              <p data-hu="&gt;6–≤12 hónap; az elsődleges elemzésből kizárva" data-en="&gt;6–≤12 months; excluded from the primary analysis">&gt;6–≤12 hónap; az elsődleges elemzésből kizárva</p>
+            </article>
+            <article class="gad-time-card">
+              <h3 data-hu="Késői" data-en="Late">Késői</h3>
+              <b>39</b>
+              <p data-hu="kezelés több mint 12 hónappal a kezdet után" data-en="treated more than 12 months after onset">kezelés több mint 12 hónappal a kezdet után</p>
+            </article>
+          </div>
+          <div class="gad-timing-context">
+            <div><strong>248 / 375</strong><span data-hu="kapott immunterápiát (66,1%)" data-en="received immunotherapy (66.1%)">kapott immunterápiát (66,1%)</span></div>
+            <div><strong>113 / 248</strong><span data-hu="időzítése ismert (45,6%)" data-en="had known timing (45.6%)">időzítése ismert (45,6%)</span></div>
+            <div><strong>109</strong><span data-hu="eset az elsődleges összehasonlításban" data-en="cases in the primary comparison">eset az elsődleges összehasonlításban</span></div>
+          </div>
+
+          <div class="gad-regimens">
+            <div class="gad-ring" role="img" aria-label="204 besorolható kezdő kezelés" data-aria-hu="204 besorolható kezdő kezelés" data-aria-en="204 classifiable initial regimens">
+              <span><strong>204</strong><span data-hu="besorolható kezdő kezelés" data-en="classifiable initial regimens">besorolható kezdő kezelés</span></span>
+            </div>
+            <div class="gad-legend" role="group" aria-label="Kezdő kezelések összetétele" data-aria-hu="Kezdő kezelések összetétele" data-aria-en="Starting regimen composition">
+              <div class="gad-legend-row"><i style="--swatch:#82ff72"></i><span data-hu="szteroid + IVIG" data-en="steroid + IVIG">szteroid + IVIG</span><b>104 · 51,0%</b></div>
+              <div class="gad-legend-row"><i style="--swatch:#7c8b87"></i><span data-hu="szteroid" data-en="steroid">szteroid</span><b>37</b></div>
+              <div class="gad-legend-row"><i style="--swatch:#476a5e"></i><span>IVIG</span><b>22</b></div>
+              <div class="gad-legend-row"><i style="--swatch:#2ea476"></i><span>rituximab / CD20</span><b>16</b></div>
+              <div class="gad-legend-row"><i style="--swatch:#a7b2b0"></i><span data-hu="antimetabolit" data-en="antimetabolite">antimetabolit</span><b>15</b></div>
+              <div class="gad-legend-row"><i style="--swatch:#1b5943"></i><span data-hu="szteroid + plazmacsere" data-en="steroid + plasma exchange">szteroid + plazmacsere</span><b>7</b></div>
+              <div class="gad-legend-row"><i style="--swatch:#303a37"></i><span data-hu="apheresis" data-en="apheresis">apheresis</span><b>3</b></div>
+            </div>
+          </div>
+          <p class="gad-note" data-hu="A kezelési osztályok az elemzés egyes részeiben átfedhetnek; ezért nem minden kategória adható össze egymással." data-en="Treatment classes can overlap in parts of the analysis; categories should therefore not always be summed.">A kezelési osztályok az elemzés egyes részeiben átfedhetnek; ezért nem minden kategória adható össze egymással.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="gad-section" id="forest" aria-labelledby="forest-title">
+      <div class="gad-shell">
+        <div class="gad-section-head">
+          <div>
+            <span class="gad-index">04 · <span data-hu="Kezelésiosztály-térkép" data-en="Treatment-class map">Kezelésiosztály-térkép</span></span>
+            <h2 class="gad-h2" id="forest-title" data-hu="Korai mínusz késői válaszkülönbség" data-en="Early minus late response difference">Korai mínusz késői válaszkülönbség</h2>
+          </div>
+          <p class="gad-lead" data-hu="Az ábra az első értékelt kimenetelnél a jó válasz arányának kockázati különbségét (RD) mutatja százalékpontban, 95%-os konfidenciaintervallummal. Jó kimenetel: rohammentesség és/vagy legalább 50%-os rohamcsökkenés." data-en="At the first assessed outcome, the plot shows the risk difference (RD) in good-response rates, in percentage points, with 95% confidence intervals. Good outcome: seizure freedom and/or at least a 50% seizure reduction.">Az ábra az első értékelt kimenetelnél a jó válasz arányának kockázati különbségét (RD) mutatja százalékpontban, 95%-os konfidenciaintervallummal. Jó kimenetel: rohammentesség és/vagy legalább 50%-os rohamcsökkenés.</p>
+        </div>
+
+        <div class="gad-panel gad-forest-wrap">
+          <div class="gad-forest" role="group" aria-label="Kockázatikülönbség-forest plot" data-aria-hu="Kockázatikülönbség-forest plot" data-aria-en="Risk difference forest plot">
+            <div class="gad-forest-head" aria-hidden="true">
+              <span data-hu="Kezelési osztály" data-en="Treatment class">Kezelési osztály</span>
+              <span data-hu="RD és 95% CI (százalékpont)" data-en="RD and 95% CI (percentage points)">RD és 95% CI (százalékpont)</span>
+              <span data-hu="Korai vs késői" data-en="Early vs late">Korai vs késői</span>
+            </div>
+
+            <div class="gad-forest-row">
+              <button class="gad-forest-name" type="button" data-forest="steroid" data-hu="Szteroid" data-en="Steroid">Szteroid</button>
+              <div class="gad-forest-chart" aria-hidden="true">
+                <span class="gad-ci" style="--lo:5.74%;--hi:39.22%"></span><span class="gad-rd" style="--rd:18.61%"></span>
+              </div>
+              <div class="gad-forest-values"><b>−3,6 [−18,4; 20,1]</b>44/52 vs 15/17</div>
+            </div>
+
+            <div class="gad-forest-row">
+              <button class="gad-forest-name" type="button" data-forest="apheresis" data-hu="Apheresis" data-en="Apheresis">Apheresis</button>
+              <div class="gad-forest-chart" aria-hidden="true">
+                <span class="gad-ci" style="--lo:31.74%;--hi:94.96%"></span><span class="gad-rd" style="--rd:71.39%"></span>
+              </div>
+              <div class="gad-forest-values"><b>+57,1 [11,5; 84,2]</b>8/8 vs 3/7</div>
+            </div>
+
+            <div class="gad-forest-row">
+              <button class="gad-forest-name" type="button" data-forest="rtx">Rituximab / CD20</button>
+              <div class="gad-forest-chart" aria-hidden="true">
+                <span class="gad-ci" style="--lo:28.43%;--hi:84.09%"></span><span class="gad-rd" style="--rd:59.83%"></span>
+              </div>
+              <div class="gad-forest-values"><b>+43,8 [7,7; 72,7]</b>15/16 vs 4/8</div>
+            </div>
+
+            <div class="gad-forest-row">
+              <button class="gad-forest-name" type="button" data-forest="escalation" data-hu="Szélesebb eszkaláció" data-en="Broader escalation">Szélesebb eszkaláció</button>
+              <div class="gad-forest-chart" aria-hidden="true">
+                <span class="gad-ci" style="--lo:27.22%;--hi:80.96%"></span><span class="gad-rd" style="--rd:55.57%"></span>
+              </div>
+              <div class="gad-forest-values"><b>+38,9 [6,3; 68,1]</b>17/18 vs 5/9</div>
+            </div>
+
+            <div class="gad-forest-row">
+              <button class="gad-forest-name" type="button" data-forest="antimetabolite">AZA / MMF / TAC</button>
+              <div class="gad-forest-chart" aria-hidden="true">
+                <span class="gad-ci" style="--lo:34.09%;--hi:94.35%"></span><span class="gad-rd" style="--rd:73.04%"></span>
+              </div>
+              <div class="gad-forest-values"><b>+59,0 [14,2; 83,5]</b>12/13 vs 2/6</div>
+            </div>
+
+            <div class="gad-forest-row">
+              <button class="gad-forest-name" type="button" data-forest="maintenance" data-hu="Epizód utáni fenntartás" data-en="Post-episode maintenance">Epizód utáni fenntartás</button>
+              <div class="gad-forest-chart" aria-hidden="true">
+                <span class="gad-ci" style="--lo:26.52%;--hi:87.22%"></span><span class="gad-rd" style="--rd:64.35%"></span>
+              </div>
+              <div class="gad-forest-values"><b>+49,0 [5,5; 75,3]</b>14/17 vs 2/6</div>
+            </div>
+
+            <div class="gad-axis" aria-hidden="true">
+              <span></span>
+              <div class="gad-axis-scale"><span>−25</span><span>0</span><span>25</span><span>50</span><span>75</span><span>90</span></div>
+              <span></span>
+            </div>
+          </div>
+          <p class="gad-forest-detail" data-forest-detail><strong>Szteroid:</strong> a konfidenciaintervallum átmetszi a nullát; az adatok nem mutattak korai szteroide­lőnyt. Ez nem bizonyít egyenértékűséget vagy hatástalanságot.</p>
+          <div class="gad-followup" role="group" aria-label="Utolsó követés összefoglalása" data-aria-hu="Utolsó követés összefoglalása" data-aria-en="Last follow-up summary">
+            <article><h3 data-hu="Szteroid · utolsó követés" data-en="Steroid · last follow-up">Szteroid · utolsó követés</h3><b>RD −5,2</b><span>44/53 vs 15/17</span></article>
+            <article><h3 data-hu="Rituximab/CD20 · utolsó követés" data-en="Rituximab/CD20 · last follow-up">Rituximab/CD20 · utolsó követés</h3><b>RD +43,8</b><span>15/16 vs 4/8</span></article>
+            <article><h3 data-hu="Szélesebb eszkaláció · utolsó követés" data-en="Broader escalation · last follow-up">Szélesebb eszkaláció · utolsó követés</h3><b>RD +38,9</b><span>17/18 vs 5/9</span></article>
+            <article><h3 data-hu="Apheresis / fenntartás" data-en="Apheresis / maintenance">Apheresis / fenntartás</h3><b data-hu="kevésbé egyértelmű" data-en="less clear">kevésbé egyértelmű</b><span data-hu="az utolsó követésnél" data-en="at last follow-up">az utolsó követésnél</span></article>
+          </div>
+          <p class="gad-note" data-hu="Olvasási kulcs: a nullától jobbra eső pozitív RD több jó kimenetelt jelez a korai csoportban. A kicsi — néhol 6–9 fős — késői cellák miatt az intervallumok bizonytalanok; a csoportok nem randomizáltak." data-en="Reading key: a positive RD to the right of zero indicates more good outcomes in the early group. The small late cells—sometimes only 6–9 people—make estimates uncertain; groups were not randomized.">Olvasási kulcs: a nullától jobbra eső pozitív RD több jó kimenetelt jelez a korai csoportban. A kicsi — néhol 6–9 fős — késői cellák miatt az intervallumok bizonytalanok; a csoportok nem randomizáltak.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="gad-section" id="duration" aria-labelledby="duration-title">
+      <div class="gad-shell">
+        <div class="gad-section-head">
+          <div>
+            <span class="gad-index">05 · <span data-hu="Időtartam és kimenetel" data-en="Duration and outcome">Időtartam és kimenetel</span></span>
+            <h2 class="gad-h2" id="duration-title" data-hu="Rövidebb kezelést megelőző idő a jó kimenetelű esetekben" data-en="Shorter pre-treatment duration among good outcomes">Rövidebb kezelést megelőző idő a jó kimenetelű esetekben</h2>
+          </div>
+          <p class="gad-lead" data-hu="A jó kimenetelű eseteknél rövidebb volt az immunterápia előtti betegségtartam mind az első értékelt kimenetelnél, mind az utolsó követésnél. Ez megfigyeléses összefüggés: a kezelés megválasztása, a súlyosság és más zavaró tényezők befolyásolhatták." data-en="Cases with good outcomes had shorter disease duration before immunotherapy at both the first assessed outcome and last follow-up. This is an observational association: treatment selection, severity, and other confounders may have influenced it.">A jó kimenetelű eseteknél rövidebb volt az immunterápia előtti betegségtartam mind az első értékelt kimenetelnél, mind az utolsó követésnél. Ez megfigyeléses összefüggés: a kezelés megválasztása, a súlyosság és más zavaró tényezők befolyásolhatták.</p>
+        </div>
+
+        <div class="gad-duration-grid">
+          <article class="gad-panel gad-duration-card">
+            <h3 data-hu="Első értékelt kimenetel" data-en="First assessed outcome">Első értékelt kimenetel</h3>
+            <div class="gad-river">
+              <div class="gad-river-row"><span data-hu="jó kimenetel" data-en="good outcome">jó kimenetel</span><div class="gad-river-track"><div class="gad-river-fill" style="--w:26.6%"></div></div><b>1,33 <small data-hu="év" data-en="y">év</small></b></div>
+              <div class="gad-river-row"><span data-hu="nem jó" data-en="non-good">nem jó</span><div class="gad-river-track"><div class="gad-river-fill" style="--w:100%"></div></div><b>5,0 <small data-hu="év" data-en="y">év</small></b></div>
+            </div>
+            <p class="gad-note">IQR 0,17–5 vs 1–14,25 · p=0,00086</p>
+          </article>
+          <article class="gad-panel gad-duration-card">
+            <h3 data-hu="Utolsó követés" data-en="Last follow-up">Utolsó követés</h3>
+            <div class="gad-river">
+              <div class="gad-river-row"><span data-hu="jó kimenetel" data-en="good outcome">jó kimenetel</span><div class="gad-river-track"><div class="gad-river-fill" style="--w:37.5%"></div></div><b>1,5 <small data-hu="év" data-en="y">év</small></b></div>
+              <div class="gad-river-row"><span data-hu="nem jó" data-en="non-good">nem jó</span><div class="gad-river-track"><div class="gad-river-fill" style="--w:100%"></div></div><b>4,0 <small data-hu="év" data-en="y">év</small></b></div>
+            </div>
+            <p class="gad-note">p=0,0241</p>
+          </article>
+        </div>
+        <p class="gad-note" data-hu="A kiindulási változók közül egyik sem érte el az FDR-korrigált q&lt;0,05 küszöböt. A gyógyszerrezisztencia korai kimenetellel való összefüggésének q-értéke 0,056 volt (jó kimenetel: 54/82 [65,9%] vs nem gyógyszerrezisztens: 18/18 [100%])." data-en="None of the baseline variables met the FDR-adjusted q&lt;0.05 threshold. The association between drug resistance and early outcome had q=0.056 (good outcome: 54/82 [65.9%] vs non-drug-resistant: 18/18 [100%]).">A kiindulási változók közül egyik sem érte el az FDR-korrigált q&lt;0,05 küszöböt. A gyógyszerrezisztencia korai kimenetellel való összefüggésének q-értéke 0,056 volt (jó kimenetel: 54/82 [65,9%] vs nem gyógyszerrezisztens: 18/18 [100%]).</p>
+      </div>
+    </section>
+
+    <section class="gad-section" id="network" aria-labelledby="network-title">
+      <div class="gad-shell">
+        <div class="gad-section-head">
+          <div>
+            <span class="gad-index">06 · <span data-hu="Autoimmunitás-konstelláció" data-en="Autoimmunity constellation">Autoimmunitás-konstelláció</span></span>
+            <h2 class="gad-h2" id="network-title" data-hu="Jelek a központi GAD65 körül" data-en="Signals around the GAD65 core">Jelek a központi GAD65 körül</h2>
+          </div>
+          <p class="gad-lead" data-hu="A kinyert esetleírásokban több immunológiai és képalkotó jel társult a GAD65-antitesthez. Válassz csomópontot. A számok esetszámok; a változónként eltérő adathiány miatt nem közös nevezőből számolt arányok." data-en="Multiple immunologic and imaging signals accompanied GAD65 antibodies in the extracted reports. Select a node. Counts are case counts, not proportions from a shared denominator, because missingness varied by variable.">A kinyert esetleírásokban több immunológiai és képalkotó jel társult a GAD65-antitesthez. Válassz csomópontot. A számok esetszámok; a változónként eltérő adathiány miatt nem közös nevezőből számolt arányok.</p>
+        </div>
+
+        <div class="gad-panel gad-network">
+          <div class="gad-core"><span><strong>GAD65</strong><span data-hu="antitest-asszociált epilepszia" data-en="antibody-associated epilepsy">antitest-asszociált epilepszia</span></span></div>
+          <button class="gad-node" type="button" aria-pressed="true" data-node="titer"><span><b>224</b><small data-hu="nagyon magas titer" data-en="very high titre">nagyon magas titer</small></span></button>
+          <button class="gad-node" type="button" aria-pressed="false" data-node="intrathecal"><span><b>87</b><small data-hu="intrathecal jel" data-en="intrathecal signal">intrathecal jel</small></span></button>
+          <button class="gad-node" type="button" aria-pressed="false" data-node="additional"><span><b>75</b><small data-hu="további antitest" data-en="additional antibody">további antitest</small></span></button>
+          <button class="gad-node" type="button" aria-pressed="false" data-node="inflammatory"><span><b>135</b><small data-hu="gyulladásos MRI" data-en="inflammatory MRI">gyulladásos MRI</small></span></button>
+          <button class="gad-node" type="button" aria-pressed="false" data-node="hs"><span><b>46</b><small data-hu="egyoldali HS" data-en="unilateral HS">egyoldali HS</small></span></button>
+          <button class="gad-node" type="button" aria-pressed="false" data-node="negative"><span><b>99</b><small data-hu="MRI-negatív" data-en="MRI-negative">MRI-negatív</small></span></button>
+          <button class="gad-node" type="button" aria-pressed="false" data-node="se"><span><b>50</b><small>status epilepticus</small></span></button>
+          <p class="gad-network-detail" data-node-detail aria-live="polite">224 esetet soroltak a nagyon magas GAD65-antitest-titer kategóriába; a laboratóriumi módszerek és küszöbök a források között eltérhettek.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="gad-section" id="limits" aria-labelledby="limits-title">
+      <div class="gad-shell">
+        <div class="gad-section-head">
+          <div>
+            <span class="gad-index">07 · <span data-hu="Bizonytalansági lencse" data-en="Uncertainty lens">Bizonytalansági lencse</span></span>
+            <h2 class="gad-h2" id="limits-title" data-hu="A térkép nem randomizált vizsgálat" data-en="The map is not a randomized trial">A térkép nem randomizált vizsgálat</h2>
+          </div>
+          <p class="gad-lead" data-hu="A betegszintű összegzés erőssége a ritka állapot szétszórt eseteinek egyesítése. Ugyanez a forrása a legfontosabb korlátoknak is." data-en="The strength of a patient-level synthesis is bringing together dispersed cases in a rare condition. The same feature also creates its central limitations.">A betegszintű összegzés erőssége a ritka állapot szétszórt eseteinek egyesítése. Ugyanez a forrása a legfontosabb korlátoknak is.</p>
+        </div>
+
+        <div class="gad-limit-grid">
+          <article class="gad-limit"><span class="gad-limit-icon">∅</span><h3 data-hu="Adathiány" data-en="Missing data">Adathiány</h3><p data-hu="A kezelteknek csak 45,6%-ánál volt ismert az időzítés. A nevezők változónként és kimenetelenként eltérnek." data-en="Timing was known for only 45.6% of treated cases. Denominators vary by variable and outcome.">A kezelteknek csak 45,6%-ánál volt ismert az időzítés. A nevezők változónként és kimenetelenként eltérnek.</p></article>
+          <article class="gad-limit"><span class="gad-limit-icon">↗</span><h3 data-hu="Publikációs és szelekciós torzítás" data-en="Publication and selection bias">Publikációs és szelekciós torzítás</h3><p data-hu="A közölt esetek nem feltétlenül reprezentálják az összes GAD65-asszociált epilepsziás beteget; a szokatlan vagy sikeres esetek felülreprezentáltak lehetnek." data-en="Published cases may not represent all patients with GAD65-associated epilepsy; unusual or successful cases may be overrepresented.">A közölt esetek nem feltétlenül reprezentálják az összes GAD65-asszociált epilepsziás beteget; a szokatlan vagy sikeres esetek felülreprezentáltak lehetnek.</p></article>
+          <article class="gad-limit"><span class="gad-limit-icon">≠</span><h3 data-hu="Konfundálás" data-en="Confounding">Konfundálás</h3><p data-hu="A korán és későn kezelt csoportok klinikailag különbözhettek. A terápia nem véletlenszerű kiosztás eredménye volt." data-en="Early- and late-treated groups may have differed clinically. Treatment was not randomly assigned.">A korán és későn kezelt csoportok klinikailag különbözhettek. A terápia nem véletlenszerű kiosztás eredménye volt.</p></article>
+          <article class="gad-limit"><span class="gad-limit-icon">n</span><h3 data-hu="Kicsi cellák" data-en="Small cells">Kicsi cellák</h3><p data-hu="Több késői kezelési alcsoport csupán 6–9 esetet tartalmazott. Egy-két beteg is érdemben módosíthatja a becslést." data-en="Several late-treatment subgroups contained only 6–9 cases. One or two patients can materially shift an estimate.">Több késői kezelési alcsoport csupán 6–9 esetet tartalmazott. Egy-két beteg is érdemben módosíthatja a becslést.</p></article>
+          <article class="gad-limit"><span class="gad-limit-icon">⌁</span><h3 data-hu="Átfedő kezelések" data-en="Overlapping treatments">Átfedő kezelések</h3><p data-hu="Egy beteg több terápiás osztályhoz is hozzájárulhatott az elemzés bizonyos részeiben; az osztályok nem függetlenek." data-en="A patient could contribute to more than one treatment class in parts of the analysis; classes are not independent.">Egy beteg több terápiás osztályhoz is hozzájárulhatott az elemzés bizonyos részeiben; az osztályok nem függetlenek.</p></article>
+          <article class="gad-limit"><span class="gad-limit-icon">?</span><h3 data-hu="Hipotézis, nem rangsor" data-en="Hypothesis, not ranking">Hipotézis, nem rangsor</h3><p data-hu="A rituximab/CD20 és a szélesebb eszkaláció korai jele, illetve a szteroide­lőny hiánya feltáró. Nem bizonyít kezelési fölényt vagy okozati hatást." data-en="The early signal for rituximab/CD20 and broader escalation, and the absence of an early steroid advantage, are exploratory. They do not establish treatment superiority or causality.">A rituximab/CD20 és a szélesebb eszkaláció korai jele, illetve a szteroide­lőny hiánya feltáró. Nem bizonyít kezelési fölényt vagy okozati hatást.</p></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="gad-section" id="sources" aria-labelledby="sources-title">
+      <div class="gad-shell">
+        <div class="gad-section-head">
+          <div>
+            <span class="gad-index">08 · <span data-hu="Források" data-en="Sources">Források</span></span>
+            <h2 class="gad-h2" id="sources-title" data-hu="Olvasd el az eredeti közleményt" data-en="Read the original publication">Olvasd el az eredeti közleményt</h2>
+          </div>
+          <p class="gad-lead" data-hu="Az interaktív oldal a megjelent tanulmány vizuális összefoglalója. A módszerek, definíciók, teljes eredménytáblák és esetlista az eredeti cikkben és mellékletében találhatók." data-en="This interactive page is a visual summary of the published study. Methods, definitions, full result tables, and the case list are available in the original article and supplement.">Az interaktív oldal a megjelent tanulmány vizuális összefoglalója. A módszerek, definíciók, teljes eredménytáblák és esetlista az eredeti cikkben és mellékletében találhatók.</p>
+        </div>
+
+        <div class="gad-source-grid">
+          <article class="gad-panel gad-source-card">
+            <h3 data-hu="Eredeti közlemény" data-en="Original article">Eredeti közlemény</h3>
+            <p class="gad-citation">Janszky J Jr, Janszky J, Horváth R. <cite>Timing, Composition, and Clinical Correlates of Immunotherapy Response in GAD65 Antibody-Associated Epilepsy: A Literature-Derived Patient-Level Analysis of 375 Published Cases.</cite> Neurology International. 2026;18(6):121.</p>
+            <div class="gad-source-links">
+              <a class="gad-pill" href="https://doi.org/10.3390/neurolint18060121" target="_blank" rel="noopener">DOI</a>
+              <a class="gad-pill" href="https://www.mdpi.com/2035-8377/18/6/121" target="_blank" rel="noopener">MDPI</a>
+              <a class="gad-pill" href="https://pubmed.ncbi.nlm.nih.gov/42347129/" target="_blank" rel="noopener">PubMed</a>
+              <a class="gad-pill" href="https://pmc.ncbi.nlm.nih.gov/articles/PMC13305307/" target="_blank" rel="noopener">PMC</a>
+            </div>
+          </article>
+          <article class="gad-panel gad-source-card">
+            <h3 data-hu="Adatok és nyilvántartás" data-en="Data and records">Adatok és nyilvántartás</h3>
+            <p data-hu="A melléklet tartalmazza a részletes betegszintű táblákat. Az MTMT-rekord a magyar tudományos bibliográfiai bejegyzéshez vezet." data-en="The supplement contains detailed patient-level tables. The MTMT record links to the Hungarian scholarly bibliographic entry.">A melléklet tartalmazza a részletes betegszintű táblákat. Az MTMT-rekord a magyar tudományos bibliográfiai bejegyzéshez vezet.</p>
+            <div class="gad-source-links">
+              <a class="gad-pill" href="https://www.mdpi.com/article/10.3390/neurolint18060121/s1" target="_blank" rel="noopener" data-hu="Melléklet" data-en="Supplement">Melléklet</a>
+              <a class="gad-pill" href="https://m2.mtmt.hu/gui2/?mode=browse&amp;params=publication;37346990" target="_blank" rel="noopener">MTMT</a>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="gad-shell gad-footer">
+    <a class="gad-back" href="../../"><span class="gad-back-mark" aria-hidden="true">←</span><span data-hu="Vissza a profilomhoz" data-en="Back to my profile">Vissza a profilomhoz</span></a>
+    <span>© 2026 József Janszky · <span data-hu="Interaktív kutatási összefoglaló" data-en="Interactive research summary">Interaktív kutatási összefoglaló</span></span>
+  </footer>
+
+  <script>
+    window.PAGE_I18N = {
+      hu: { title: "GAD65-asszociált epilepszia · Interaktív evidenciatérkép" },
+      en: { title: "GAD65 antibody-associated epilepsy · Interactive evidence map" }
+    };
+    (function () {
+      "use strict";
+
+      var language = localStorage.getItem("lang") === "en" ? "en" : "hu";
+      var stages = {
+        hu: {
+          full: { number: "166", label: "auditált teljes szöveg", detail: "1988 és 2026 között megjelent források; a keresés 2025. május 1. és 2026. április 1. között zajlott." },
+          sources: { number: "132", label: "adatot adó közlemény", detail: "A 166 auditált teljes szövegből 132 járult hozzá betegszintű adatokkal; 34 forrás nem adott felhasználható esetadatot." },
+          cases: { number: "375", label: "egyedi publikált eset", detail: "A közlemények betegszintű egyeztetése után 375 egyedi eset alkotta a teljes elemzési állományt." }
+        },
+        en: {
+          full: { number: "166", label: "audited full texts", detail: "Sources published from 1988 to 2026; the search ran from 1 May 2025 to 1 April 2026." },
+          sources: { number: "132", label: "contributing publications", detail: "Of 166 audited full texts, 132 contributed patient-level data; 34 sources provided no usable case data." },
+          cases: { number: "375", label: "unique published cases", detail: "After patient-level reconciliation across publications, 375 unique cases formed the full analytic dataset." }
+        }
+      };
+      var atlas = {
+        hu: {
+          women: ["253/347", "A rendelkezésre álló nemi adat alapján a publikált esetek 72,9%-a nő volt."],
+          onset: ["25 év", "A rohamkezdet átlagéletkora 25 év volt, 1–80 éves tartománnyal."],
+          dre: ["179/210", "A besorolható esetek 85,2%-ában írtak le gyógyszerrezisztens epilepsziát."],
+          tle: ["223/375", "Definitív temporális lebeny epilepsziát az összes egyedi eset 59,5%-ában azonosítottak."],
+          unilateral: ["99 eset", "99 esetet egyoldali temporális lebeny epilepsziaként írtak le."],
+          bilateral: ["63 eset", "63 esetben közöltek kétoldali temporális MRI-eltérést."],
+          multifocal: ["65 eset", "65 eset multifokális epilepsziás mintázatot mutatott."],
+          mri: ["99 eset", "99 esetben az MRI nem mutatott strukturális eltérést."]
+        },
+        en: {
+          women: ["253/347", "Among cases with sex data available, 72.9% were women."],
+          onset: ["25 years", "Mean age at seizure onset was 25 years, with a range of 1–80 years."],
+          dre: ["179/210", "Drug-resistant epilepsy was reported in 85.2% of classifiable cases."],
+          tle: ["223/375", "Definite temporal lobe epilepsy was identified in 59.5% of all unique cases."],
+          unilateral: ["99 cases", "Ninety-nine cases were described as unilateral temporal lobe epilepsy."],
+          bilateral: ["63 cases", "Bilateral temporal MRI abnormalities were reported in 63 cases."],
+          multifocal: ["65 cases", "Sixty-five cases showed a multifocal epilepsy pattern."],
+          mri: ["99 cases", "MRI showed no structural abnormality in 99 cases."]
+        }
+      };
+      var forest = {
+        hu: {
+          steroid: ["Szteroid", "a konfidenciaintervallum átmetszi a nullát; az adatok nem mutattak korai szteroide­lőnyt. Ez nem bizonyít egyenértékűséget vagy hatástalanságot."],
+          apheresis: ["Apheresis", "a korai–késői különbség +57,1 százalékpont volt, de a késői csoport mindössze 7 esetből állt."],
+          rtx: ["Rituximab / CD20", "a korai csoportban 15/16, a későiben 4/8 volt a jó kezdeti kimenetel; feltáró jel, nem összehasonlító hatásossági bizonyíték."],
+          escalation: ["Szélesebb eszkaláció", "a korai csoportban 17/18, a későiben 5/9 volt a jó kimenetel; a kis és nem randomizált csoportok korlátozzák az értelmezést."],
+          antimetabolite: ["AZA / MMF / TAC", "a becslés pozitív, de a késői cella csak 6 esetet tartalmazott; a konfidenciaintervallum ezért széles."],
+          maintenance: ["Epizód utáni fenntartás", "a korai csoportban 14/17, a későiben 2/6 volt a jó kimenetel; az utolsó követésnél a minta kevésbé volt egyértelmű."]
+        },
+        en: {
+          steroid: ["Steroid", "the confidence interval crosses zero; the data showed no early steroid advantage. This does not establish equivalence or lack of efficacy."],
+          apheresis: ["Apheresis", "the early–late difference was +57.1 percentage points, but the late group contained only 7 cases."],
+          rtx: ["Rituximab / CD20", "good initial outcome occurred in 15/16 early and 4/8 late cases; this is an exploratory signal, not comparative efficacy evidence."],
+          escalation: ["Broader escalation", "good outcome occurred in 17/18 early and 5/9 late cases; small, non-randomized groups constrain interpretation."],
+          antimetabolite: ["AZA / MMF / TAC", "the estimate is positive, but the late cell contains only 6 cases, producing a wide confidence interval."],
+          maintenance: ["Post-episode maintenance", "good outcome occurred in 14/17 early and 2/6 late cases; the pattern was less clear at last follow-up."]
+        }
+      };
+      var network = {
+        hu: {
+          titer: "224 esetet soroltak a nagyon magas GAD65-antitest-titer kategóriába; a laboratóriumi módszerek és küszöbök a források között eltérhettek.",
+          intrathecal: "87 esetben közöltek intrathecalis markert vagy kapcsolódó liquorjelet.",
+          additional: "75 esetben további neuronális vagy autoimmun antitestet is közöltek.",
+          inflammatory: "135 esetben gyulladásos jellegű MRI-eltérést írtak le.",
+          hs: "46 esetben egyoldali hippocampalis sclerosist közöltek.",
+          negative: "99 esetben az MRI strukturális eltérés nélkül maradt.",
+          se: "50 esetben status epilepticus szerepelt a klinikai történetben."
+        },
+        en: {
+          titer: "A very high GAD65 antibody titre was recorded in 224 cases; laboratory methods and thresholds may have varied across sources.",
+          intrathecal: "An intrathecal marker or related CSF signal was reported in 87 cases.",
+          additional: "An additional neuronal or autoimmune antibody was reported in 75 cases.",
+          inflammatory: "Inflammatory-appearing MRI abnormalities were reported in 135 cases.",
+          hs: "Unilateral hippocampal sclerosis was reported in 46 cases.",
+          negative: "MRI remained structurally negative in 99 cases.",
+          se: "Status epilepticus appeared in the clinical history of 50 cases."
+        }
+      };
+
+      function setText(element, value) {
+        if (element) element.textContent = value;
+      }
+
+      function updateStage(button) {
+        var key = button.getAttribute("data-stage-key");
+        var count = Number(button.getAttribute("data-stage"));
+        document.querySelectorAll(".gad-stage-tab").forEach(function (tab) {
+          tab.setAttribute("aria-selected", String(tab === button));
+        });
+        setText(document.querySelector("[data-stage-number]"), stages[language][key].number);
+        setText(document.querySelector("[data-stage-label]"), stages[language][key].label);
+        setText(document.querySelector("[data-stage-detail]"), stages[language][key].detail);
+        var dots = document.querySelectorAll(".gad-dot");
+        dots.forEach(function (dot, index) {
+          dot.classList.toggle("is-lit", index < count);
+        });
+      }
+
+      function applyLanguage(nextLanguage) {
+        language = nextLanguage === "en" ? "en" : "hu";
+        document.documentElement.lang = language;
+        document.title = document.body.getAttribute("data-title-" + language);
+        document.querySelectorAll("[data-hu][data-en]").forEach(function (element) {
+          element.textContent = element.getAttribute("data-" + language);
+        });
+        document.querySelectorAll("[data-aria-hu][data-aria-en]").forEach(function (element) {
+          element.setAttribute("aria-label", element.getAttribute("data-aria-" + language));
+        });
+        document.querySelectorAll("[data-lang]").forEach(function (button) {
+          button.setAttribute("aria-pressed", String(button.getAttribute("data-lang") === language));
+        });
+        localStorage.setItem("lang", language);
+        var activeStage = document.querySelector(".gad-stage-tab[aria-selected='true']");
+        if (activeStage) updateStage(activeStage);
+        var activeAtlas = document.querySelector(".gad-atlas-button[aria-pressed='true']");
+        if (activeAtlas) updateAtlas(activeAtlas);
+        var activeNode = document.querySelector(".gad-node[aria-pressed='true']");
+        if (activeNode) updateNode(activeNode);
+        var activeForest = document.querySelector(".gad-forest-name.is-active") || document.querySelector(".gad-forest-name");
+        if (activeForest) updateForest(activeForest);
+      }
+
+      function updateAtlas(button) {
+        var key = button.getAttribute("data-atlas");
+        document.querySelectorAll(".gad-atlas-button").forEach(function (item) {
+          item.setAttribute("aria-pressed", String(item === button));
+        });
+        setText(document.querySelector("[data-atlas-big]"), atlas[language][key][0]);
+        setText(document.querySelector("[data-atlas-copy]"), atlas[language][key][1]);
+      }
+
+      function updateForest(button) {
+        var key = button.getAttribute("data-forest");
+        document.querySelectorAll(".gad-forest-name").forEach(function (item) {
+          item.classList.toggle("is-active", item === button);
+        });
+        var copy = document.querySelector("[data-forest-detail]");
+        if (copy) {
+          copy.textContent = "";
+          var strong = document.createElement("strong");
+          strong.textContent = forest[language][key][0] + ": ";
+          copy.appendChild(strong);
+          copy.appendChild(document.createTextNode(forest[language][key][1]));
+        }
+      }
+
+      function updateNode(button) {
+        var key = button.getAttribute("data-node");
+        document.querySelectorAll(".gad-node").forEach(function (item) {
+          item.setAttribute("aria-pressed", String(item === button));
+        });
+        setText(document.querySelector("[data-node-detail]"), network[language][key]);
+      }
+
+      var dotfield = document.querySelector("[data-dotfield]");
+      if (dotfield) {
+        var fragment = document.createDocumentFragment();
+        for (var i = 0; i < 375; i += 1) {
+          var dot = document.createElement("span");
+          dot.className = "gad-dot";
+          fragment.appendChild(dot);
+        }
+        dotfield.appendChild(fragment);
+      }
+
+      document.querySelectorAll("[data-lang]").forEach(function (button) {
+        button.addEventListener("click", function () { applyLanguage(button.getAttribute("data-lang")); });
+      });
+      document.addEventListener("research:language", function (event) {
+        if (event.detail && event.detail.lang !== language) applyLanguage(event.detail.lang);
+      });
+      document.querySelectorAll(".gad-stage-tab").forEach(function (button) {
+        button.addEventListener("click", function () { updateStage(button); });
+      });
+      document.querySelectorAll(".gad-atlas-button").forEach(function (button) {
+        button.addEventListener("click", function () { updateAtlas(button); });
+      });
+      document.querySelectorAll(".gad-forest-name").forEach(function (button) {
+        button.addEventListener("click", function () { updateForest(button); });
+      });
+      document.querySelectorAll(".gad-node").forEach(function (button) {
+        button.addEventListener("click", function () { updateNode(button); });
+      });
+      var motionButton = document.querySelector("[data-motion]");
+      if (motionButton) {
+        motionButton.addEventListener("click", function () {
+          var isPaused = document.body.classList.toggle("gad-motion-off");
+          motionButton.setAttribute("aria-pressed", String(isPaused));
+          motionButton.title = language === "hu" ? (isPaused ? "Mozgás folytatása" : "Mozgás szüneteltetése") : (isPaused ? "Resume motion" : "Pause motion");
+        });
+      }
+
+      applyLanguage(language);
+      var firstStage = document.querySelector(".gad-stage-tab");
+      if (firstStage) updateStage(firstStage);
+    }());
+  </script>
+  <script src="../shared/research.js" defer></script>
+</body>
+</html>
