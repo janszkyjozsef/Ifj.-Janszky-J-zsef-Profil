@@ -1,0 +1,1394 @@
+<!doctype html>
+<html lang="hu">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <meta name="theme-color" content="#06110d">
+  <meta name="description" content="A bilingual, interactive visual summary of a 2026 narrative review on fenfluramine in Dravet syndrome and Lennox-Gastaut syndrome.">
+  <title>Fenfluramin · Interaktív kutatási összefoglaló</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&amp;family=Source+Serif+4:opsz,wght@8..60,500;8..60,650&amp;display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../shared/research.css">
+  <style>
+    :root {
+      --fen-black: #030806;
+      --fen-ink: #07130f;
+      --fen-panel: rgba(10, 28, 21, .78);
+      --fen-green: #53f08d;
+      --fen-venom: #b6ff58;
+      --fen-silver: #c8d0d2;
+      --fen-muted: #95a49f;
+      --fen-line: rgba(199, 217, 210, .19);
+      --fen-warn: #f1ca78;
+      --fen-radius: 24px;
+      --fen-serif: "Source Serif 4", Georgia, serif;
+      --fen-sans: Manrope, system-ui, sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body.fen-page {
+      margin: 0;
+      color: var(--fen-silver);
+      background:
+        radial-gradient(circle at 76% 7%, rgba(65, 226, 129, .13), transparent 28rem),
+        radial-gradient(circle at 10% 44%, rgba(182, 255, 88, .055), transparent 32rem),
+        linear-gradient(180deg, #020604 0%, #06110d 48%, #020604 100%);
+      font: 400 1rem/1.65 var(--fen-sans);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    body.fen-page::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: -2;
+      pointer-events: none;
+      opacity: .24;
+      background-image:
+        linear-gradient(rgba(164, 255, 198, .055) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(164, 255, 198, .055) 1px, transparent 1px);
+      background-size: 54px 54px;
+      mask-image: linear-gradient(to bottom, black, transparent 88%);
+    }
+
+    a { color: inherit; }
+
+    button, a { -webkit-tap-highlight-color: transparent; }
+
+    button { font: inherit; }
+
+    :focus-visible {
+      outline: 2px solid var(--fen-venom);
+      outline-offset: 4px;
+    }
+
+    .fen-skip {
+      position: fixed;
+      top: 12px;
+      left: 12px;
+      z-index: 999;
+      padding: .72rem 1rem;
+      border-radius: 999px;
+      color: #031008;
+      background: var(--fen-venom);
+      transform: translateY(-160%);
+      transition: transform .2s ease;
+      font-weight: 700;
+      text-decoration: none;
+    }
+
+    .fen-skip:focus { transform: translateY(0); }
+
+    .fen-progress {
+      position: fixed;
+      z-index: 100;
+      inset: 0 auto auto 0;
+      height: 2px;
+      width: 100%;
+      transform: scaleX(0);
+      transform-origin: left;
+      background: linear-gradient(90deg, var(--fen-green), var(--fen-venom), #dfe5e7);
+      box-shadow: 0 0 18px rgba(127, 255, 155, .65);
+    }
+
+    .fen-wrap {
+      width: min(1180px, calc(100% - 2rem));
+      margin-inline: auto;
+    }
+
+    .fen-header {
+      position: sticky;
+      z-index: 80;
+      top: 0;
+      border-bottom: 1px solid var(--fen-line);
+      background: rgba(2, 8, 5, .82);
+      backdrop-filter: blur(22px) saturate(135%);
+    }
+
+    .fen-header__inner {
+      min-height: 72px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+
+    .fen-brand {
+      display: inline-flex;
+      align-items: center;
+      gap: .7rem;
+      color: #eef4f1;
+      text-decoration: none;
+      font-weight: 700;
+      letter-spacing: -.02em;
+    }
+
+    .fen-brand__mark {
+      width: 1.75rem;
+      aspect-ratio: 1;
+      border: 1px solid rgba(182, 255, 88, .7);
+      border-radius: 50%;
+      position: relative;
+      box-shadow: inset 0 0 15px rgba(83, 240, 141, .2), 0 0 18px rgba(83, 240, 141, .13);
+    }
+
+    .fen-brand__mark::before,
+    .fen-brand__mark::after {
+      content: "";
+      position: absolute;
+      border-radius: 50%;
+      background: var(--fen-green);
+      box-shadow: 0 0 8px rgba(83, 240, 141, .75);
+    }
+
+    .fen-brand__mark::before { width: 5px; height: 5px; top: 5px; left: 6px; }
+    .fen-brand__mark::after { width: 3px; height: 3px; right: 5px; bottom: 6px; }
+
+    .fen-nav { display: flex; align-items: center; gap: .35rem; }
+
+    .fen-nav > a {
+      padding: .5rem .66rem;
+      color: var(--fen-muted);
+      text-decoration: none;
+      font-size: .82rem;
+      transition: color .2s ease;
+    }
+
+    .fen-nav > a:hover { color: #f2f7f4; }
+
+    .fen-controls { display: flex; align-items: center; gap: .45rem; }
+
+    .fen-language,
+    .fen-motion {
+      display: flex;
+      align-items: center;
+      gap: .25rem;
+      padding: .2rem;
+      border: 1px solid var(--fen-line);
+      border-radius: 999px;
+      background: rgba(255,255,255,.025);
+    }
+
+    .fen-language button,
+    .fen-motion {
+      border: 0;
+      color: var(--fen-muted);
+      background: transparent;
+      cursor: pointer;
+    }
+
+    .fen-language button {
+      min-width: 2.35rem;
+      padding: .38rem .5rem;
+      border-radius: 999px;
+      font-size: .75rem;
+      font-weight: 700;
+    }
+
+    .fen-language button[aria-pressed="true"] {
+      color: #051008;
+      background: var(--fen-green);
+    }
+
+    .fen-motion {
+      width: 2.25rem;
+      height: 2.25rem;
+      justify-content: center;
+      padding: 0;
+    }
+
+    .fen-motion svg { width: 1rem; height: 1rem; }
+
+    .fen-hero {
+      position: relative;
+      min-height: min(820px, calc(100vh - 72px));
+      display: grid;
+      grid-template-columns: minmax(0, 1.05fr) minmax(360px, .95fr);
+      align-items: center;
+      gap: clamp(2.5rem, 6vw, 6.5rem);
+      padding-block: clamp(4.5rem, 9vw, 8rem);
+    }
+
+    .fen-kicker {
+      display: flex;
+      align-items: center;
+      gap: .65rem;
+      margin: 0 0 1rem;
+      color: var(--fen-green);
+      font-size: .72rem;
+      font-weight: 700;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+    }
+
+    .fen-kicker::before {
+      content: "";
+      width: 2rem;
+      height: 1px;
+      background: currentColor;
+      box-shadow: 0 0 9px currentColor;
+    }
+
+    .fen-hero h1 {
+      max-width: 13ch;
+      margin: 0;
+      color: #edf2ef;
+      font: 650 clamp(3.25rem, 8.4vw, 7rem)/.88 var(--fen-serif);
+      letter-spacing: -.065em;
+    }
+
+    .fen-hero h1 > span:last-child { color: var(--fen-venom); }
+
+    .fen-deck {
+      max-width: 64ch;
+      margin: 1.6rem 0 0;
+      color: #b6c2be;
+      font-size: clamp(1rem, 1.4vw, 1.18rem);
+    }
+
+    .fen-citation {
+      margin: 1.1rem 0 0;
+      color: var(--fen-muted);
+      font-size: .78rem;
+    }
+
+    .fen-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .55rem;
+      margin-top: 1.45rem;
+    }
+
+    .fen-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: .45rem;
+      min-height: 2.5rem;
+      padding: .56rem .85rem;
+      border: 1px solid var(--fen-line);
+      border-radius: 999px;
+      color: #dce4e0;
+      background: rgba(255,255,255,.025);
+      text-decoration: none;
+      font-size: .76rem;
+      font-weight: 700;
+      letter-spacing: .03em;
+      transition: border-color .2s ease, background .2s ease, transform .2s ease;
+    }
+
+    .fen-chip:hover {
+      transform: translateY(-2px);
+      border-color: rgba(83, 240, 141, .55);
+      background: rgba(83, 240, 141, .08);
+    }
+
+    .fen-chip::after { content: "↗"; color: var(--fen-green); }
+
+    .fen-warning {
+      margin-top: 1.5rem;
+      padding: 1rem 1.1rem;
+      border: 1px solid rgba(241, 202, 120, .28);
+      border-left: 3px solid var(--fen-warn);
+      border-radius: 4px 16px 16px 4px;
+      color: #d6cfbd;
+      background: rgba(241, 202, 120, .045);
+      font-size: .8rem;
+    }
+
+    .fen-warning strong { color: #ffe3a6; }
+
+    .fen-signal {
+      position: relative;
+      min-height: 560px;
+      isolation: isolate;
+    }
+
+    .fen-signal::before,
+    .fen-signal::after {
+      content: "";
+      position: absolute;
+      inset: 50%;
+      border: 1px solid rgba(116, 255, 157, .2);
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+    }
+
+    .fen-signal::before { width: 72%; aspect-ratio: 1; }
+    .fen-signal::after { width: 95%; aspect-ratio: 1; border-style: dashed; opacity: .45; }
+
+    .fen-signal__field {
+      position: absolute;
+      inset: 6%;
+      border-radius: 49% 51% 62% 38% / 49% 44% 56% 51%;
+      background:
+        repeating-radial-gradient(circle at 50% 50%, transparent 0 32px, rgba(159, 255, 187, .055) 33px 34px),
+        radial-gradient(circle at 50%, rgba(83, 240, 141, .14), transparent 62%);
+      filter: drop-shadow(0 0 35px rgba(83, 240, 141, .08));
+      animation: fen-breathe 10s ease-in-out infinite;
+    }
+
+    .fen-signal__line {
+      position: absolute;
+      z-index: 1;
+      top: 50%;
+      left: 50%;
+      height: 1px;
+      width: 34%;
+      transform-origin: left;
+      background: linear-gradient(90deg, rgba(83,240,141,.9), rgba(199,208,210,.08));
+      box-shadow: 0 0 8px rgba(83,240,141,.35);
+    }
+
+    .fen-signal__line:nth-of-type(1) { transform: rotate(-68deg); }
+    .fen-signal__line:nth-of-type(2) { transform: rotate(-21deg); }
+    .fen-signal__line:nth-of-type(3) { transform: rotate(32deg); }
+    .fen-signal__line:nth-of-type(4) { transform: rotate(82deg); }
+    .fen-signal__line:nth-of-type(5) { transform: rotate(147deg); }
+
+    .fen-node {
+      position: absolute;
+      z-index: 3;
+      display: grid;
+      place-items: center;
+      width: 5.8rem;
+      aspect-ratio: 1;
+      border: 1px solid rgba(200, 208, 210, .26);
+      border-radius: 50%;
+      color: #dfe7e3;
+      background: rgba(4, 15, 10, .88);
+      box-shadow: inset 0 0 18px rgba(83,240,141,.05), 0 8px 32px rgba(0,0,0,.45);
+      cursor: pointer;
+      font-size: .72rem;
+      font-weight: 700;
+      letter-spacing: .02em;
+      transition: transform .22s ease, border-color .22s ease, background .22s ease;
+    }
+
+    .fen-node:hover,
+    .fen-node[aria-pressed="true"] {
+      z-index: 5;
+      transform: scale(1.08);
+      border-color: var(--fen-green);
+      color: #06110d;
+      background: var(--fen-green);
+      box-shadow: 0 0 28px rgba(83,240,141,.28);
+    }
+
+    .fen-node--core {
+      top: 50%;
+      left: 50%;
+      width: 8.2rem;
+      transform: translate(-50%, -50%);
+      border-color: rgba(182,255,88,.6);
+      color: #07130e;
+      background: radial-gradient(circle at 35% 30%, #e5ffba, var(--fen-venom) 38%, #4adf84 100%);
+      box-shadow: 0 0 50px rgba(83, 240, 141, .25);
+      font: 650 1rem var(--fen-serif);
+    }
+
+    .fen-node--core:hover { transform: translate(-50%, -50%) scale(1.05); }
+    .fen-node--a { top: 8%; left: 48%; }
+    .fen-node--b { top: 24%; right: 0; }
+    .fen-node--c { right: 8%; bottom: 15%; }
+    .fen-node--d { bottom: 0; left: 30%; }
+    .fen-node--e { left: 0; top: 44%; }
+
+    .fen-signal__caption {
+      position: absolute;
+      z-index: 4;
+      left: 50%;
+      bottom: 6%;
+      width: min(90%, 410px);
+      padding: .8rem 1rem;
+      border: 1px solid var(--fen-line);
+      border-radius: 14px;
+      color: #b8c4bf;
+      background: rgba(2,9,6,.88);
+      transform: translateX(-50%);
+      font-size: .76rem;
+      text-align: center;
+    }
+
+    .fen-signal__caption strong { display: block; color: var(--fen-venom); margin-bottom: .15rem; }
+
+    @keyframes fen-breathe {
+      0%, 100% { transform: scale(.985) rotate(-1deg); opacity: .75; }
+      50% { transform: scale(1.02) rotate(1deg); opacity: 1; }
+    }
+
+    .fen-section { padding-block: clamp(5rem, 9vw, 9rem); scroll-margin-top: 82px; }
+
+    .fen-section + .fen-section { border-top: 1px solid rgba(199, 217, 210, .1); }
+
+    .fen-section__head {
+      display: grid;
+      grid-template-columns: minmax(0, .7fr) minmax(320px, 1.3fr);
+      gap: 2rem 5rem;
+      align-items: end;
+      margin-bottom: clamp(2.5rem, 5vw, 4.5rem);
+    }
+
+    .fen-index {
+      color: var(--fen-green);
+      font-size: .68rem;
+      font-weight: 700;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+    }
+
+    .fen-section h2 {
+      max-width: 14ch;
+      margin: .55rem 0 0;
+      color: #edf3f0;
+      font: 650 clamp(2.25rem, 4.2vw, 4.25rem)/.98 var(--fen-serif);
+      letter-spacing: -.045em;
+      overflow-wrap: normal;
+    }
+
+    .fen-section__intro {
+      max-width: 64ch;
+      margin: 0;
+      color: #aebcb7;
+    }
+
+    .fen-method-note {
+      display: flex;
+      align-items: flex-start;
+      gap: .9rem;
+      padding: 1rem 1.15rem;
+      border: 1px solid rgba(182,255,88,.2);
+      border-radius: 16px;
+      color: #b7c4bf;
+      background: rgba(182,255,88,.035);
+      font-size: .78rem;
+    }
+
+    .fen-method-note::before { content: "◇"; color: var(--fen-venom); font-size: 1.1rem; }
+
+    .fen-explorer {
+      border: 1px solid var(--fen-line);
+      border-radius: var(--fen-radius);
+      overflow: hidden;
+      background: linear-gradient(145deg, rgba(11,32,24,.88), rgba(3,11,7,.95));
+      box-shadow: 0 30px 90px rgba(0,0,0,.26);
+    }
+
+    .fen-explorer__top {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 1rem;
+      padding: 1.25rem;
+      border-bottom: 1px solid var(--fen-line);
+    }
+
+    .fen-tabs { display: flex; flex-wrap: wrap; gap: .45rem; }
+
+    .fen-tab,
+    .fen-filter,
+    .fen-region {
+      border: 1px solid var(--fen-line);
+      border-radius: 999px;
+      padding: .62rem .9rem;
+      color: #aebbb6;
+      background: rgba(255,255,255,.02);
+      cursor: pointer;
+      font-size: .76rem;
+      font-weight: 700;
+      transition: color .2s ease, background .2s ease, border-color .2s ease;
+    }
+
+    .fen-tab:hover,
+    .fen-filter:hover,
+    .fen-region:hover { border-color: rgba(83,240,141,.5); color: #edf5f0; }
+
+    .fen-tab[aria-selected="true"],
+    .fen-filter[aria-pressed="true"],
+    .fen-region[aria-pressed="true"] {
+      color: #04100a;
+      border-color: var(--fen-green);
+      background: var(--fen-green);
+    }
+
+    .fen-context-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: .45rem;
+      color: var(--fen-muted);
+      font-size: .68rem;
+      text-transform: uppercase;
+      letter-spacing: .1em;
+    }
+
+    .fen-context-tag::before {
+      content: "";
+      width: .45rem;
+      aspect-ratio: 1;
+      border-radius: 50%;
+      background: var(--fen-green);
+      box-shadow: 0 0 9px var(--fen-green);
+    }
+
+    .fen-trial-panel {
+      display: grid;
+      grid-template-columns: minmax(260px, .72fr) minmax(0, 1.28fr);
+      gap: 2rem 4rem;
+      padding: clamp(1.5rem, 4vw, 3.5rem);
+    }
+
+    .fen-trial-panel[hidden] { display: none; }
+
+    .fen-trial-copy h3 {
+      margin: .4rem 0 .8rem;
+      color: #edf3f0;
+      font: 650 clamp(1.65rem, 3vw, 2.5rem)/1.05 var(--fen-serif);
+      letter-spacing: -.025em;
+    }
+
+    .fen-trial-copy p { color: #a9b7b2; font-size: .9rem; }
+
+    .fen-trial-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .45rem;
+      margin-top: 1.2rem;
+    }
+
+    .fen-trial-meta span {
+      padding: .4rem .62rem;
+      border: 1px solid var(--fen-line);
+      border-radius: 999px;
+      color: #d0dad6;
+      font-size: .69rem;
+    }
+
+    .fen-chart {
+      min-width: 0;
+      align-self: center;
+    }
+
+    .fen-chart__title {
+      margin-bottom: 1.2rem;
+      color: #d9e1dd;
+      font-size: .76rem;
+      font-weight: 700;
+      letter-spacing: .04em;
+    }
+
+    .fen-bars { display: grid; gap: .9rem; }
+
+    .fen-bar {
+      display: grid;
+      grid-template-columns: minmax(120px, .65fr) minmax(160px, 1.35fr) 3.5rem;
+      gap: .75rem;
+      align-items: center;
+    }
+
+    .fen-bar__label { color: #abb8b3; font-size: .74rem; }
+
+    .fen-bar__track {
+      height: .72rem;
+      border-radius: 999px;
+      background: rgba(255,255,255,.055);
+      overflow: hidden;
+    }
+
+    .fen-bar__fill {
+      display: block;
+      width: calc(var(--value) * 1%);
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, #2cca70, var(--fen-venom));
+      box-shadow: 0 0 14px rgba(83,240,141,.28);
+      transform-origin: left;
+      animation: fen-grow .9s cubic-bezier(.2,.75,.25,1) both;
+    }
+
+    .fen-bar--silver .fen-bar__fill { background: linear-gradient(90deg, #64716c, #bdc8c3); box-shadow: none; }
+    .fen-bar--low .fen-bar__fill { background: linear-gradient(90deg, #197b4a, #54c47d); }
+
+    .fen-bar__value { color: #edf5f0; font: 650 1rem var(--fen-serif); text-align: right; }
+
+    @keyframes fen-grow { from { transform: scaleX(0); } }
+
+    .fen-chart__foot {
+      margin: 1.2rem 0 0;
+      color: var(--fen-muted);
+      font-size: .7rem;
+    }
+
+    .fen-stat-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: .7rem;
+      margin-top: 1.35rem;
+    }
+
+    .fen-stat {
+      padding: .85rem;
+      border: 1px solid var(--fen-line);
+      border-radius: 14px;
+      background: rgba(255,255,255,.018);
+    }
+
+    .fen-stat strong { display: block; color: var(--fen-venom); font: 650 1.25rem var(--fen-serif); }
+    .fen-stat span { display: block; margin-top: .2rem; color: var(--fen-muted); font-size: .66rem; }
+
+    .fen-table-wrap { overflow-x: auto; margin-top: 1.5rem; }
+
+    .fen-sr-table {
+      width: 100%;
+      border-collapse: collapse;
+      color: #b7c3be;
+      font-size: .72rem;
+    }
+
+    .fen-sr-table caption { padding: .5rem 0; color: var(--fen-muted); text-align: left; }
+    .fen-sr-table th, .fen-sr-table td { padding: .65rem; border-bottom: 1px solid var(--fen-line); text-align: left; }
+    .fen-sr-table th { color: #e0e7e3; }
+
+    .fen-compare-warning {
+      margin-top: 1rem;
+      color: #cbd4d0;
+      font-size: .74rem;
+      text-align: center;
+    }
+
+    .fen-compare-warning strong { color: var(--fen-warn); }
+
+    .fen-timeline-controls { display: flex; justify-content: center; gap: .45rem; margin-bottom: 2.3rem; }
+
+    .fen-timeline {
+      position: relative;
+      display: grid;
+      grid-template-columns: repeat(5, minmax(180px, 1fr));
+      gap: 1rem;
+      overflow-x: auto;
+      padding: 1rem .1rem 1.5rem;
+      scroll-snap-type: x mandatory;
+    }
+
+    .fen-timeline::before {
+      content: "";
+      position: absolute;
+      top: 2rem;
+      left: 6%;
+      right: 6%;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--fen-green), var(--fen-silver), transparent);
+      opacity: .42;
+    }
+
+    .fen-time-card {
+      position: relative;
+      z-index: 1;
+      min-height: 280px;
+      padding: 3.15rem 1.05rem 1.05rem;
+      border: 1px solid var(--fen-line);
+      border-radius: 20px;
+      background: rgba(7, 22, 16, .76);
+      scroll-snap-align: start;
+      transition: opacity .2s ease, transform .2s ease;
+    }
+
+    .fen-time-card::before {
+      content: "";
+      position: absolute;
+      top: .66rem;
+      left: 1rem;
+      width: .72rem;
+      aspect-ratio: 1;
+      border: 3px solid #07150f;
+      border-radius: 50%;
+      background: var(--fen-green);
+      box-shadow: 0 0 14px rgba(83,240,141,.65);
+    }
+
+    .fen-time-card[data-kind="lgs"]::before { background: var(--fen-silver); box-shadow: 0 0 14px rgba(199,208,210,.35); }
+    .fen-time-card[data-kind="both"]::before { background: var(--fen-venom); }
+    .fen-time-card.is-muted { opacity: .16; transform: scale(.97); }
+
+    .fen-time-card small { color: var(--fen-green); font-size: .62rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
+    .fen-time-card h3 { margin: .55rem 0 .65rem; color: #e7eeea; font: 650 1.25rem/1.1 var(--fen-serif); }
+    .fen-time-card p { margin: 0; color: #a8b5b0; font-size: .76rem; }
+    .fen-time-card strong { color: var(--fen-venom); }
+
+    .fen-evidence-key {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 1rem;
+      margin-top: 1.5rem;
+      color: var(--fen-muted);
+      font-size: .68rem;
+    }
+
+    .fen-evidence-key span { display: inline-flex; align-items: center; gap: .4rem; }
+    .fen-evidence-key i { width: .5rem; height: .5rem; border-radius: 50%; background: var(--fen-green); }
+    .fen-evidence-key span:nth-child(2) i { background: var(--fen-silver); }
+
+    .fen-safety-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.05fr) minmax(280px, .95fr);
+      gap: 1.2rem;
+    }
+
+    .fen-card {
+      border: 1px solid var(--fen-line);
+      border-radius: var(--fen-radius);
+      background: linear-gradient(145deg, rgba(11,30,22,.78), rgba(4,12,8,.92));
+      overflow: hidden;
+    }
+
+    .fen-card__head {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      padding: 1.2rem 1.35rem;
+      border-bottom: 1px solid var(--fen-line);
+    }
+
+    .fen-card__head h3 { margin: 0; color: #e8efeb; font: 650 1.35rem var(--fen-serif); }
+
+    .fen-regions { display: flex; gap: .4rem; }
+
+    .fen-region-panel { padding: clamp(1.3rem, 3.5vw, 2.7rem); }
+    .fen-region-panel[hidden] { display: none; }
+
+    .fen-monitor-path {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: .7rem;
+      margin-top: 1.5rem;
+    }
+
+    .fen-monitor-step {
+      position: relative;
+      min-height: 135px;
+      padding: 1rem;
+      border: 1px solid var(--fen-line);
+      border-radius: 16px;
+      background: rgba(255,255,255,.018);
+    }
+
+    .fen-monitor-step::after {
+      content: "→";
+      position: absolute;
+      top: 50%;
+      right: -.64rem;
+      z-index: 2;
+      color: var(--fen-green);
+      transform: translateY(-50%);
+    }
+
+    .fen-monitor-step:last-child::after { content: none; }
+    .fen-monitor-step b { display: block; color: var(--fen-green); font: 650 1.1rem var(--fen-serif); }
+    .fen-monitor-step span { display: block; margin-top: .4rem; color: #aab7b2; font-size: .69rem; }
+
+    .fen-region-note { margin: 1.2rem 0 0; color: var(--fen-muted); font-size: .74rem; }
+
+    .fen-safety-stack { display: grid; gap: 1.2rem; }
+
+    .fen-safety-block { padding: 1.3rem; }
+    .fen-safety-block h3 { margin: 0 0 .65rem; color: #e8efeb; font: 650 1.2rem var(--fen-serif); }
+    .fen-safety-block p { margin: 0; color: #aab7b2; font-size: .77rem; }
+    .fen-safety-block + .fen-safety-block { border-top: 1px solid var(--fen-line); }
+
+    .fen-ae-list { display: flex; flex-wrap: wrap; gap: .42rem; margin-top: .85rem; }
+    .fen-ae-list span { padding: .38rem .55rem; border-radius: 999px; color: #d8e0dc; background: rgba(83,240,141,.07); font-size: .66rem; }
+
+    .fen-safety-alert {
+      display: flex;
+      gap: .85rem;
+      margin-top: 1rem;
+      padding: .9rem;
+      border: 1px solid rgba(241,202,120,.2);
+      border-radius: 14px;
+      color: #d8ceb6;
+      background: rgba(241,202,120,.045);
+      font-size: .72rem;
+    }
+
+    .fen-safety-alert::before { content: "!"; color: var(--fen-warn); font-weight: 700; }
+
+    .fen-limit-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: .8rem;
+    }
+
+    .fen-limit {
+      min-height: 210px;
+      padding: 1.2rem;
+      border-top: 1px solid rgba(83,240,141,.65);
+      border-right: 1px solid var(--fen-line);
+      border-bottom: 1px solid var(--fen-line);
+      border-left: 1px solid var(--fen-line);
+      border-radius: 4px 4px 18px 18px;
+      background: rgba(255,255,255,.018);
+    }
+
+    .fen-limit span { color: var(--fen-green); font: 650 2rem var(--fen-serif); }
+    .fen-limit h3 { margin: .5rem 0 .65rem; color: #e3ebe7; font: 650 1rem/1.15 var(--fen-serif); }
+    .fen-limit p { margin: 0; color: #9faca7; font-size: .72rem; }
+
+    .fen-source {
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr) minmax(250px, .8fr);
+      gap: 2rem;
+      padding: clamp(1.5rem, 4vw, 3.5rem);
+      border: 1px solid rgba(83,240,141,.22);
+      border-radius: var(--fen-radius);
+      background:
+        linear-gradient(130deg, rgba(83,240,141,.08), transparent 45%),
+        rgba(4,15,10,.86);
+      box-shadow: inset 0 1px rgba(255,255,255,.035);
+    }
+
+    .fen-source h2 { max-width: none; margin: 0 0 1rem; font-size: clamp(2rem, 4vw, 3.6rem); }
+    .fen-source cite { color: #bdc8c3; font-style: normal; }
+    .fen-source__meta { margin-top: 1rem; color: var(--fen-muted); font-size: .76rem; }
+    .fen-source__links { display: grid; grid-template-columns: 1fr 1fr; gap: .55rem; align-content: start; }
+    .fen-source__links .fen-chip { justify-content: space-between; }
+
+    .fen-footer {
+      padding-block: 2.5rem;
+      border-top: 1px solid var(--fen-line);
+      color: var(--fen-muted);
+      font-size: .74rem;
+    }
+
+    .fen-footer__inner { display: flex; justify-content: space-between; align-items: center; gap: 1rem; }
+
+    .fen-back {
+      display: inline-flex;
+      align-items: center;
+      gap: .45rem;
+      color: #dce4e0;
+      text-decoration: none;
+      font-weight: 700;
+    }
+
+    .fen-back::before { content: "←"; color: var(--fen-green); }
+
+    .fen-reveal { opacity: 0; transform: translateY(22px); transition: opacity .7s ease, transform .7s ease; }
+    .fen-reveal.is-visible { opacity: 1; transform: none; }
+
+    .motion-paused *,
+    .motion-paused *::before,
+    .motion-paused *::after { animation-play-state: paused !important; transition-duration: 0s !important; }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; }
+      .fen-reveal { opacity: 1; transform: none; }
+    }
+
+    @media (max-width: 980px) {
+      .fen-nav { display: none; }
+      .fen-hero { grid-template-columns: 1fr; }
+      .fen-signal { min-height: 500px; width: min(100%, 620px); margin-inline: auto; }
+      .fen-section__head { grid-template-columns: 1fr; }
+      .fen-trial-panel, .fen-safety-grid, .fen-source { grid-template-columns: 1fr; }
+      .fen-limit-grid { grid-template-columns: repeat(2, 1fr); }
+      .fen-monitor-path { grid-template-columns: repeat(2, 1fr); }
+      .fen-monitor-step:nth-child(2)::after { content: none; }
+    }
+
+    @media (max-width: 640px) {
+      .fen-wrap { width: calc(100vw - 1.15rem); max-width: 1180px; }
+      .fen-header__inner { min-height: 62px; }
+      .fen-brand span:last-child { display: none; }
+      .fen-motion { display: none; }
+      .fen-hero { padding-top: 3.5rem; }
+      .fen-hero h1 { max-width: 100%; font-size: clamp(2.45rem, 13vw, 3.7rem); }
+      .fen-signal { min-height: 420px; }
+      .fen-signal__field { inset: 10%; }
+      .fen-node { width: 4.6rem; font-size: .62rem; }
+      .fen-node--core { width: 6.5rem; }
+      .fen-node--a { top: 4%; }
+      .fen-node--b { right: -2%; }
+      .fen-node--c { right: 0; }
+      .fen-node--d { left: 25%; }
+      .fen-node--e { left: -2%; }
+      .fen-signal__caption { bottom: 2%; }
+      .fen-explorer__top { display: block; }
+      .fen-context-tag { margin-top: .9rem; }
+      .fen-trial-panel { padding: 1.1rem; }
+      .fen-bar { grid-template-columns: 1fr 2.1rem; gap: .4rem .6rem; }
+      .fen-bar__label { grid-column: 1 / -1; }
+      .fen-bar__track { grid-column: 1; }
+      .fen-stat-grid { grid-template-columns: 1fr; }
+      .fen-limit-grid { grid-template-columns: 1fr; }
+      .fen-monitor-path { grid-template-columns: 1fr; }
+      .fen-monitor-step::after { content: "↓" !important; top: auto; right: 50%; bottom: -.9rem; transform: translateX(50%); }
+      .fen-monitor-step:last-child::after { content: none !important; }
+      .fen-source__links { grid-template-columns: 1fr; }
+      .fen-footer__inner { align-items: flex-start; flex-direction: column; }
+    }
+  </style>
+</head>
+<body class="fen-page">
+  <a class="fen-skip" href="#main" data-hu="Ugrás a tartalomra" data-en="Skip to content">Ugrás a tartalomra</a>
+  <div class="fen-progress" id="fenProgress" aria-hidden="true"></div>
+
+  <header class="fen-header">
+    <div class="fen-wrap fen-header__inner">
+      <a class="fen-brand" href="../../" aria-label="Vissza a szakmai profilhoz" data-aria-hu="Vissza a szakmai profilhoz" data-aria-en="Back to professional profile">
+        <span class="fen-brand__mark" aria-hidden="true"></span>
+        <span data-hu="József Janszky · kutatási atlasz" data-en="József Janszky · research atlas">József Janszky · kutatási atlasz</span>
+      </a>
+      <nav class="fen-nav" aria-label="Oldalszakaszok" data-aria-hu="Oldalszakaszok" data-aria-en="Page sections">
+        <a href="#evidence" data-hu="Vizsgálatok" data-en="Trials">Vizsgálatok</a>
+        <a href="#timeline" data-hu="Bizonyítékív" data-en="Evidence arc">Bizonyítékív</a>
+        <a href="#safety" data-hu="Biztonság" data-en="Safety">Biztonság</a>
+        <a href="#source" data-hu="Forrás" data-en="Source">Forrás</a>
+      </nav>
+      <div class="fen-controls">
+        <div class="fen-language" role="group" aria-label="Nyelv" data-aria-hu="Nyelv" data-aria-en="Language">
+          <button type="button" data-fen-lang="hu" data-lang="hu" aria-pressed="true">HU</button>
+          <button type="button" data-fen-lang="en" data-lang="en" aria-pressed="false">EN</button>
+        </div>
+        <button class="fen-motion" id="fenMotion" type="button" data-motion-toggle aria-pressed="false" aria-label="Animáció szüneteltetése" data-aria-hu="Animáció szüneteltetése" data-aria-en="Pause animation">
+          <svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M6.5 4.5v11M13.5 4.5v11" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="fen-wrap fen-hero" aria-labelledby="page-title">
+      <div class="fen-hero__copy fen-reveal">
+        <p class="fen-kicker" data-hu="Narratív áttekintés · 2026" data-en="Narrative review · 2026">Narratív áttekintés · 2026</p>
+        <h1 id="page-title"><span data-hu="Fenfluramin" data-en="Fenfluramine">Fenfluramin</span><span>.</span></h1>
+        <p class="fen-deck" data-hu="Mechanizmus, klinikai bizonyíték, biztonság és gyakorlati integráció Dravet-szindrómában és Lennox–Gastaut-szindrómában — rétegenként felfedezhető vizuális összefoglaló." data-en="Mechanism, clinical evidence, safety, and practical integration in Dravet syndrome and Lennox–Gastaut syndrome — a visual summary to explore layer by layer.">Mechanizmus, klinikai bizonyíték, biztonság és gyakorlati integráció Dravet-szindrómában és Lennox–Gastaut-szindrómában — rétegenként felfedezhető vizuális összefoglaló.</p>
+        <p class="fen-citation">Janszky J, Janszky J Jr, Horváth R. <em>Epilepsy &amp; Behavior Reports.</em> 2026;35:100876.</p>
+        <div class="fen-links" role="navigation" aria-label="Publikációs linkek" data-aria-hu="Publikációs linkek" data-aria-en="Publication links">
+          <a class="fen-chip" href="https://doi.org/10.1016/j.ebr.2026.100876" target="_blank" rel="noopener">DOI</a>
+          <a class="fen-chip" href="https://pmc.ncbi.nlm.nih.gov/articles/PMC13320519/" target="_blank" rel="noopener">PMC</a>
+          <a class="fen-chip" href="https://pubmed.ncbi.nlm.nih.gov/42389070/" target="_blank" rel="noopener">PubMed</a>
+          <a class="fen-chip" href="https://m2.mtmt.hu/gui2/?mode=browse&amp;params=publication;37332714" target="_blank" rel="noopener">MTMT</a>
+        </div>
+        <aside class="fen-warning" aria-label="Fontos figyelmeztetés" data-aria-hu="Fontos figyelmeztetés" data-aria-en="Important notice">
+          <strong data-hu="Nem orvosi útmutató." data-en="Not medical guidance.">Nem orvosi útmutató.</strong>
+          <span data-hu=" Ez az oldal egy megjelent narratív áttekintés interaktív összefoglalója. Nem diagnosztikai vagy kezelési útmutató, és nem használható gyógyszerválasztásra, dózisszámításra vagy a kezelés módosítására. A mindenkor hatályos helyi alkalmazási előírás az irányadó." data-en=" This page is an interactive summary of a published narrative review. It is not diagnostic or treatment guidance and must not be used for drug selection, dose calculation, or treatment modification. The current local prescribing information governs."> Ez az oldal egy megjelent narratív áttekintés interaktív összefoglalója. Nem diagnosztikai vagy kezelési útmutató, és nem használható gyógyszerválasztásra, dózisszámításra vagy a kezelés módosítására. A mindenkor hatályos helyi alkalmazási előírás az irányadó.</span>
+        </aside>
+      </div>
+
+      <div class="fen-signal fen-reveal" role="group" aria-label="Interaktív mechanizmustérkép" data-aria-hu="Interaktív mechanizmustérkép" data-aria-en="Interactive mechanism map">
+        <div class="fen-signal__field" aria-hidden="true"></div>
+        <i class="fen-signal__line" aria-hidden="true"></i><i class="fen-signal__line" aria-hidden="true"></i><i class="fen-signal__line" aria-hidden="true"></i><i class="fen-signal__line" aria-hidden="true"></i><i class="fen-signal__line" aria-hidden="true"></i>
+        <button class="fen-node fen-node--core" type="button" data-mech="core" aria-pressed="true" data-hu="Fenfluramin" data-en="Fenfluramine">Fenfluramin</button>
+        <button class="fen-node fen-node--a" type="button" data-mech="5ht1d" aria-pressed="false">5-HT1D</button>
+        <button class="fen-node fen-node--b" type="button" data-mech="5ht2a" aria-pressed="false">5-HT2A</button>
+        <button class="fen-node fen-node--c" type="button" data-mech="5ht2c" aria-pressed="false">5-HT2C</button>
+        <button class="fen-node fen-node--d" type="button" data-mech="sigma" aria-pressed="false">σ1</button>
+        <button class="fen-node fen-node--e" type="button" data-mech="nor" aria-pressed="false" data-hu="Norfenfluramin" data-en="Norfenfluramine">Norfenfluramin</button>
+        <div class="fen-signal__caption" aria-live="polite">
+          <strong id="mechTitle" data-hu="Kettős mechanisztikus keret" data-en="Dual mechanistic framework">Kettős mechanisztikus keret</strong>
+          <span id="mechText" data-hu="A szerotonerg jelátvitel fokozása és a sigma‑1 receptor pozitív modulációja együtt alkotja a jelenlegi keretet." data-en="Enhanced serotonergic transmission and positive modulation of the sigma‑1 receptor form the current framework together.">A szerotonerg jelátvitel fokozása és a sigma‑1 receptor pozitív modulációja együtt alkotja a jelenlegi keretet.</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="fen-section" id="evidence" aria-labelledby="evidence-title">
+      <div class="fen-wrap">
+        <header class="fen-section__head fen-reveal">
+          <div>
+            <span class="fen-index" data-hu="01 · Klinikai jel" data-en="01 · Clinical signal">01 · Klinikai jel</span>
+            <h2 id="evidence-title" data-hu="Külön pályák, külön végpontok." data-en="Separate tracks, separate outcomes.">Külön pályák, külön végpontok.</h2>
+          </div>
+          <div>
+            <p class="fen-section__intro" data-hu="A Dravet- és a Lennox–Gastaut-vizsgálatok eltérő rohamtípusokat és elemzéseket használtak. Válassz egy vizsgálatot; a számok az adott vizsgálaton belül értelmezendők." data-en="The Dravet and Lennox–Gastaut trials used different seizure types and analyses. Choose a study; the figures belong within that study's own frame.">A Dravet- és a Lennox–Gastaut-vizsgálatok eltérő rohamtípusokat és elemzéseket használtak. Válassz egy vizsgálatot; a számok az adott vizsgálaton belül értelmezendők.</p>
+            <div class="fen-method-note" data-hu="A százalékok nem fej-fej melletti DS–LGS összehasonlítások. A vizsgálati populáció, a rohamvégpont és a módszertan eltér." data-en="These percentages are not head-to-head DS–LGS comparisons. Study populations, seizure endpoints, and methods differ.">A százalékok nem fej-fej melletti DS–LGS összehasonlítások. A vizsgálati populáció, a rohamvégpont és a módszertan eltér.</div>
+          </div>
+        </header>
+
+        <div class="fen-explorer fen-reveal" data-tabs>
+          <div class="fen-explorer__top">
+            <div class="fen-tabs" role="tablist" aria-label="Pivotal vizsgálatok" data-aria-hu="Pivotal vizsgálatok" data-aria-en="Pivotal trials">
+              <button class="fen-tab" id="tab-ds1" type="button" role="tab" aria-selected="true" aria-controls="panel-ds1" data-trial="ds1" data-tab-target="ds1" data-hu="DS · 1. vizsgálat" data-en="DS · Study 1">DS · 1. vizsgálat</button>
+              <button class="fen-tab" id="tab-ds2" type="button" role="tab" aria-selected="false" aria-controls="panel-ds2" data-trial="ds2" data-tab-target="ds2" data-hu="DS · 2. vizsgálat" data-en="DS · Study 2">DS · 2. vizsgálat</button>
+              <button class="fen-tab" id="tab-lgs" type="button" role="tab" aria-selected="false" aria-controls="panel-lgs" data-trial="lgs" data-tab-target="lgs" data-hu="LGS · 3. vizsgálat" data-en="LGS · Study 3">LGS · 3. vizsgálat</button>
+            </div>
+            <span class="fen-context-tag" id="trialContext" data-hu="Dravet-szindróma · konvulzív rohamok" data-en="Dravet syndrome · convulsive seizures">Dravet-szindróma · konvulzív rohamok</span>
+          </div>
+
+          <article class="fen-trial-panel" id="panel-ds1" role="tabpanel" aria-labelledby="tab-ds1" data-tab-panel="ds1">
+            <div class="fen-trial-copy">
+              <span class="fen-index" data-hu="Randomizált, placebokontrollos" data-en="Randomized, placebo-controlled">Randomizált, placebokontrollos</span>
+              <h3 data-hu="DS · dózistartomány" data-en="DS · dose-ranging">DS · dózistartomány</h3>
+              <p data-hu="A 14 hetes vizsgálatban a konvulzív rohamok gyakoriságának medián csökkenése dózisfüggő jelzést mutatott." data-en="Across 14 weeks, median reduction in convulsive seizure frequency showed a dose-related signal.">A 14 hetes vizsgálatban a konvulzív rohamok gyakoriságának medián csökkenése dózisfüggő jelzést mutatott.</p>
+              <div class="fen-trial-meta"><span>n=119</span><span data-hu="14 hét" data-en="14 weeks">14 hét</span><span data-hu="konvulzív roham" data-en="convulsive seizure">konvulzív roham</span></div>
+              <div class="fen-stat-grid">
+                <div class="fen-stat"><strong>62.3%</strong><span data-hu="placebóhoz viszonyított átlagos csökkenés · 0,7 mg/kg/nap" data-en="mean placebo-relative reduction · 0.7 mg/kg/day">placebóhoz viszonyított átlagos csökkenés · 0,7 mg/kg/nap</span></div>
+                <div class="fen-stat"><strong>32.4%</strong><span data-hu="placebóhoz viszonyított átlagos csökkenés · 0,2 mg/kg/nap" data-en="mean placebo-relative reduction · 0.2 mg/kg/day">placebóhoz viszonyított átlagos csökkenés · 0,2 mg/kg/nap</span></div>
+              </div>
+            </div>
+            <div class="fen-chart" role="img" aria-label="Konvulzív rohamgyakoriság medián csökkenése: 74,9%, 42,3% és 19,2%" data-aria-hu="Konvulzív rohamgyakoriság medián csökkenése: 74,9%, 42,3% és 19,2%" data-aria-en="Median reduction in convulsive seizure frequency: 74.9%, 42.3%, and 19.2%">
+              <div class="fen-chart__title" data-hu="Medián csökkenés a kiinduláshoz képest" data-en="Median reduction from baseline">Medián csökkenés a kiinduláshoz képest</div>
+              <div class="fen-bars">
+                <div class="fen-bar"><span class="fen-bar__label">0.7 mg/kg/day</span><span class="fen-bar__track"><i class="fen-bar__fill" style="--value:74.9"></i></span><strong class="fen-bar__value">74.9%</strong></div>
+                <div class="fen-bar fen-bar--low"><span class="fen-bar__label">0.2 mg/kg/day</span><span class="fen-bar__track"><i class="fen-bar__fill" style="--value:42.3"></i></span><strong class="fen-bar__value">42.3%</strong></div>
+                <div class="fen-bar fen-bar--silver"><span class="fen-bar__label" data-hu="Placebo" data-en="Placebo">Placebo</span><span class="fen-bar__track"><i class="fen-bar__fill" style="--value:19.2"></i></span><strong class="fen-bar__value">19.2%</strong></div>
+              </div>
+              <p class="fen-chart__foot" data-hu="A grafikon a publikált csoportszintű becsléseket mutatja; nem egyéni várható hatás." data-en="The chart shows published group-level estimates; it is not an individual expected effect.">A grafikon a publikált csoportszintű becsléseket mutatja; nem egyéni várható hatás.</p>
+            </div>
+          </article>
+
+          <article class="fen-trial-panel" id="panel-ds2" role="tabpanel" aria-labelledby="tab-ds2" data-tab-panel="ds2" hidden>
+            <div class="fen-trial-copy">
+              <span class="fen-index" data-hu="Randomizált · stabil stiripentol-háttér" data-en="Randomized · stable stiripentol background">Randomizált · stabil stiripentol-háttér</span>
+              <h3 data-hu="DS · stiripentol mellett" data-en="DS · with stiripentol">DS · stiripentol mellett</h3>
+              <p data-hu="A 15 hetes vizsgálat a fenfluramin és placebo közötti különbséget stabil stiripentol-tartalmú háttérkezelés mellett értékelte." data-en="The 15-week study assessed fenfluramine versus placebo on a stable stiripentol-containing background regimen.">A 15 hetes vizsgálat a fenfluramin és placebo közötti különbséget stabil stiripentol-tartalmú háttérkezelés mellett értékelte.</p>
+              <div class="fen-trial-meta"><span>n=87</span><span data-hu="15 hét" data-en="15 weeks">15 hét</span><span data-hu="stiripentol-háttér" data-en="stiripentol background">stiripentol-háttér</span></div>
+              <div class="fen-stat-grid">
+                <div class="fen-stat"><strong>54.0%</strong><span data-hu="nagyobb átlagos csökkenés a placebóhoz képest" data-en="greater average reduction versus placebo">nagyobb átlagos csökkenés a placebóhoz képest</span></div>
+                <div class="fen-stat"><strong>22 vs 13</strong><span data-hu="leghosszabb rohammentes intervallum · medián nap" data-en="longest seizure-free interval · median days">leghosszabb rohammentes intervallum · medián nap</span></div>
+              </div>
+            </div>
+            <div class="fen-chart" role="img" aria-label="Válaszarányok fenfluramin és placebo mellett" data-aria-hu="Válaszarányok fenfluramin és placebo mellett" data-aria-en="Responder rates with fenfluramine and placebo">
+              <div class="fen-chart__title" data-hu="Válaszarány · fenfluramin vs placebo" data-en="Responder rate · fenfluramine vs placebo">Válaszarány · fenfluramin vs placebo</div>
+              <div class="fen-bars">
+                <div class="fen-bar"><span class="fen-bar__label" data-hu="≥50% válasz · fenfluramin" data-en="≥50% response · fenfluramine">≥50% válasz · fenfluramin</span><span class="fen-bar__track"><i class="fen-bar__fill" style="--value:54"></i></span><strong class="fen-bar__value">54%</strong></div>
+                <div class="fen-bar fen-bar--silver"><span class="fen-bar__label" data-hu="≥50% válasz · placebo" data-en="≥50% response · placebo">≥50% válasz · placebo</span><span class="fen-bar__track"><i class="fen-bar__fill" style="--value:5"></i></span><strong class="fen-bar__value">5%</strong></div>
+                <div class="fen-bar"><span class="fen-bar__label" data-hu="≥75% válasz · fenfluramin" data-en="≥75% response · fenfluramine">≥75% válasz · fenfluramin</span><span class="fen-bar__track"><i class="fen-bar__fill" style="--value:35"></i></span><strong class="fen-bar__value">35%</strong></div>
+                <div class="fen-bar fen-bar--silver"><span class="fen-bar__label" data-hu="≥75% válasz · placebo" data-en="≥75% response · placebo">≥75% válasz · placebo</span><span class="fen-bar__track"><i class="fen-bar__fill" style="--value:2"></i></span><strong class="fen-bar__value">2%</strong></div>
+              </div>
+              <p class="fen-chart__foot" data-hu="Különböző válaszküszöbök; ugyanazon vizsgálat csoportszintű eredményei." data-en="Different response thresholds; group-level results from the same study.">Különböző válaszküszöbök; ugyanazon vizsgálat csoportszintű eredményei.</p>
+            </div>
+          </article>
+
+          <article class="fen-trial-panel" id="panel-lgs" role="tabpanel" aria-labelledby="tab-lgs" data-tab-panel="lgs" hidden>
+            <div class="fen-trial-copy">
+              <span class="fen-index" data-hu="Randomizált, placebokontrollos" data-en="Randomized, placebo-controlled">Randomizált, placebokontrollos</span>
+              <h3 data-hu="LGS · drop rohamok" data-en="LGS · drop seizures">LGS · drop rohamok</h3>
+              <p data-hu="A 14 hetes vizsgálat elsődleges klinikai kerete a drop rohamok gyakorisága volt — ez nem azonos a DS-vizsgálatok konvulzívroham-végpontjával." data-en="The 14-week study centered on drop-seizure frequency — not the same endpoint as convulsive seizures in the DS trials.">A 14 hetes vizsgálat elsődleges klinikai kerete a drop rohamok gyakorisága volt — ez nem azonos a DS-vizsgálatok konvulzívroham-végpontjával.</p>
+              <div class="fen-trial-meta"><span>n=263</span><span data-hu="14 hét" data-en="14 weeks">14 hét</span><span data-hu="drop roham" data-en="drop seizure">drop roham</span></div>
+              <div class="fen-stat-grid">
+                <div class="fen-stat"><strong>−19.9 pp</strong><span data-hu="jelentett, placebóhoz korrigált különbség · 0,7 mg/kg/nap" data-en="reported placebo-adjusted difference · 0.7 mg/kg/day">jelentett, placebóhoz korrigált különbség · 0,7 mg/kg/nap</span></div>
+                <div class="fen-stat"><strong>95% CI</strong><span>−31.0 – −8.7</span></div>
+                <div class="fen-stat"><strong>p=.001</strong><span data-hu="publikált összehasonlítás" data-en="published comparison">publikált összehasonlítás</span></div>
+              </div>
+            </div>
+            <div class="fen-chart" role="img" aria-label="Drop rohamgyakoriság medián csökkenése: 26,5%, 14,2% és 7,6%" data-aria-hu="Drop rohamgyakoriság medián csökkenése: 26,5%, 14,2% és 7,6%" data-aria-en="Median reduction in drop-seizure frequency: 26.5%, 14.2%, and 7.6%">
+              <div class="fen-chart__title" data-hu="Drop rohamgyakoriság medián csökkenése" data-en="Median reduction in drop-seizure frequency">Drop rohamgyakoriság medián csökkenése</div>
+              <div class="fen-bars">
+                <div class="fen-bar"><span class="fen-bar__label">0.7 mg/kg/day</span><span class="fen-bar__track"><i class="fen-bar__fill" style="--value:26.5"></i></span><strong class="fen-bar__value">26.5%</strong></div>
+                <div class="fen-bar fen-bar--low"><span class="fen-bar__label">0.2 mg/kg/day</span><span class="fen-bar__track"><i class="fen-bar__fill" style="--value:14.2"></i></span><strong class="fen-bar__value">14.2%</strong></div>
+                <div class="fen-bar fen-bar--silver"><span class="fen-bar__label" data-hu="Placebo" data-en="Placebo">Placebo</span><span class="fen-bar__track"><i class="fen-bar__fill" style="--value:7.6"></i></span><strong class="fen-bar__value">7.6%</strong></div>
+              </div>
+              <p class="fen-chart__foot" data-hu="≥50%-os válaszarány: 25% (0,7), 28% (0,2), 10% (placebo). E csoportszintű mintázat nem dózisajánlás." data-en="≥50% responder rates: 25% (0.7), 28% (0.2), 10% (placebo). This group-level pattern is not a dosing recommendation.">≥50%-os válaszarány: 25% (0,7), 28% (0,2), 10% (placebo). E csoportszintű mintázat nem dózisajánlás.</p>
+            </div>
+          </article>
+        </div>
+        <p class="fen-compare-warning"><strong data-hu="Olvasási szabály:" data-en="Reading rule:">Olvasási szabály:</strong> <span data-hu="a DS- és LGS-eredményekből nem képezhető közös rangsor." data-en="DS and LGS results cannot be turned into a shared ranking.">a DS- és LGS-eredményekből nem képezhető közös rangsor.</span></p>
+      </div>
+    </section>
+
+    <section class="fen-section" id="timeline" aria-labelledby="timeline-title">
+      <div class="fen-wrap">
+        <header class="fen-section__head fen-reveal">
+          <div>
+            <span class="fen-index" data-hu="02 · Bizonyítékív" data-en="02 · Evidence arc">02 · Bizonyítékív</span>
+            <h2 id="timeline-title" data-hu="A rövid RCT-ktől a hosszabb követésig." data-en="From short RCTs to longer follow-up.">A rövid RCT-ktől a hosszabb követésig.</h2>
+          </div>
+          <p class="fen-section__intro" data-hu="A hosszabb távú eredmények nyílt kiterjesztésekből származnak. Értékesek a tartósság megértéséhez, de nincs kontrollcsoportjuk és a követés során lemorzsolódás történik." data-en="Longer-term results come from open-label extensions. They inform durability, but have no control group and experience attrition over follow-up.">A hosszabb távú eredmények nyílt kiterjesztésekből származnak. Értékesek a tartósság megértéséhez, de nincs kontrollcsoportjuk és a követés során lemorzsolódás történik.</p>
+        </header>
+
+        <div class="fen-timeline-controls" role="group" aria-label="Szindróma szerinti szűrő" data-aria-hu="Szindróma szerinti szűrő" data-aria-en="Filter by syndrome">
+          <button class="fen-filter" type="button" data-filter="all" aria-pressed="true" data-hu="Mind" data-en="All">Mind</button>
+          <button class="fen-filter" type="button" data-filter="ds" aria-pressed="false">DS</button>
+          <button class="fen-filter" type="button" data-filter="lgs" aria-pressed="false">LGS</button>
+        </div>
+        <div class="fen-timeline fen-reveal" role="region" tabindex="0" aria-label="Klinikai bizonyítékok idővonala" data-aria-hu="Klinikai bizonyítékok idővonala" data-aria-en="Clinical evidence timeline">
+          <article class="fen-time-card" data-kind="ds">
+            <small data-hu="Pivotal RCT · DS" data-en="Pivotal RCT · DS">Pivotal RCT · DS</small>
+            <h3 data-hu="Dózistartomány" data-en="Dose-ranging">Dózistartomány</h3>
+            <p><strong>n=119 · 14 weeks</strong><br><span data-hu="Medián konvulzívroham-csökkenés: 74,9%, 42,3%, 19,2%." data-en="Median convulsive-seizure reduction: 74.9%, 42.3%, 19.2%.">Medián konvulzívroham-csökkenés: 74,9%, 42,3%, 19,2%.</span></p>
+          </article>
+          <article class="fen-time-card" data-kind="ds">
+            <small data-hu="Pivotal RCT · DS" data-en="Pivotal RCT · DS">Pivotal RCT · DS</small>
+            <h3 data-hu="Stiripentol mellett" data-en="With stiripentol">Stiripentol mellett</h3>
+            <p><strong>n=87 · 15 weeks</strong><br><span data-hu="54,0%-kal nagyobb átlagos csökkenés a placebóhoz képest." data-en="54.0% greater average reduction versus placebo.">54,0%-kal nagyobb átlagos csökkenés a placebóhoz képest.</span></p>
+          </article>
+          <article class="fen-time-card" data-kind="lgs">
+            <small data-hu="Pivotal RCT · LGS" data-en="Pivotal RCT · LGS">Pivotal RCT · LGS</small>
+            <h3 data-hu="Drop rohamok" data-en="Drop seizures">Drop rohamok</h3>
+            <p><strong>n=263 · 14 weeks</strong><br><span data-hu="Medián csökkenés: 26,5%, 14,2%, 7,6%." data-en="Median reduction: 26.5%, 14.2%, 7.6%.">Medián csökkenés: 26,5%, 14,2%, 7,6%.</span></p>
+          </article>
+          <article class="fen-time-card" data-kind="ds">
+            <small data-hu="Nyílt kiterjesztés · DS" data-en="Open-label extension · DS">Nyílt kiterjesztés · DS</small>
+            <h3 data-hu="Hosszabb megfigyelés" data-en="Longer observation">Hosszabb megfigyelés</h3>
+            <p><strong>n=232 · median 256 days</strong><br><span data-hu="Medián 66,8%-os konvulzívroham-csökkenés; ≥50% válasz 64,4%, ≥75% válasz 41,2%." data-en="Median 66.8% convulsive-seizure reduction; ≥50% response 64.4%, ≥75% response 41.2%.">Medián 66,8%-os konvulzívroham-csökkenés; ≥50% válasz 64,4%, ≥75% válasz 41,2%.</span></p>
+          </article>
+          <article class="fen-time-card" data-kind="lgs">
+            <small data-hu="Nyílt kiterjesztés · LGS" data-en="Open-label extension · LGS">Nyílt kiterjesztés · LGS</small>
+            <h3 data-hu="Hosszabb megfigyelés" data-en="Longer observation">Hosszabb megfigyelés</h3>
+            <p><strong>n=247 · median 364 days</strong><br><span data-hu="Összesített medián drop-roham-csökkenés 28,6%. A 15. hónap 50,5%-os becslése csak n=142 résztvevőre épült." data-en="Overall median drop-seizure reduction 28.6%. The month-15 estimate of 50.5% was based on only n=142 participants.">Összesített medián drop-roham-csökkenés 28,6%. A 15. hónap 50,5%-os becslése csak n=142 résztvevőre épült.</span></p>
+          </article>
+        </div>
+        <div class="fen-evidence-key"><span><i></i><span data-hu="DS-pálya" data-en="DS track">DS-pálya</span></span><span><i></i><span data-hu="LGS-pálya" data-en="LGS track">LGS-pálya</span></span></div>
+      </div>
+    </section>
+
+    <section class="fen-section" id="safety" aria-labelledby="safety-title">
+      <div class="fen-wrap">
+        <header class="fen-section__head fen-reveal">
+          <div>
+            <span class="fen-index" data-hu="03 · Biztonsági őr" data-en="03 · Safety guardian">03 · Biztonsági őr</span>
+            <h2 id="safety-title" data-hu="A monitorozás régiófüggő." data-en="Monitoring is region-specific.">A monitorozás régiófüggő.</h2>
+          </div>
+          <p class="fen-section__intro" data-hu="Az európai és amerikai előírások részletei nem teljesen azonosak. A kapcsoló a publikációban összefoglalt kereteket választja szét — mindig az aktuális helyi előírást kell ellenőrizni." data-en="European and US label details are not identical. The switch separates the frameworks summarized in the paper — always verify the current local label.">Az európai és amerikai előírások részletei nem teljesen azonosak. A kapcsoló a publikációban összefoglalt kereteket választja szét — mindig az aktuális helyi előírást kell ellenőrizni.</p>
+        </header>
+
+        <div class="fen-safety-grid">
+          <div class="fen-card fen-reveal">
+            <div class="fen-card__head">
+              <h3 data-hu="Echokardiográfiás útvonal" data-en="Echocardiography pathway">Echokardiográfiás útvonal</h3>
+              <div class="fen-regions" role="group" aria-label="Régió" data-aria-hu="Régió" data-aria-en="Region">
+                <button class="fen-region" type="button" data-region="eu" aria-pressed="true">EU / EMA</button>
+                <button class="fen-region" type="button" data-region="us" aria-pressed="false">US / FDA</button>
+              </div>
+            </div>
+            <div class="fen-region-panel" id="region-eu">
+              <span class="fen-index" data-hu="Európai alkalmazási előírás" data-en="European prescribing information">Európai alkalmazási előírás</span>
+              <div class="fen-monitor-path">
+                <div class="fen-monitor-step"><b data-hu="Kezdés előtt" data-en="Before start">Kezdés előtt</b><span data-hu="Kiindulási echokardiográfia." data-en="Baseline echocardiogram.">Kiindulási echokardiográfia.</span></div>
+                <div class="fen-monitor-step"><b data-hu="0–2 év" data-en="Years 0–2">0–2 év</b><span data-hu="Echokardiográfia 6 havonta." data-en="Echocardiogram every 6 months.">Echokardiográfia 6 havonta.</span></div>
+                <div class="fen-monitor-step"><b data-hu="2 év után" data-en="After 2 years">2 év után</b><span data-hu="Évente, a helyi előírás szerint." data-en="Annually, per the local label.">Évente, a helyi előírás szerint.</span></div>
+                <div class="fen-monitor-step"><b data-hu="Leállítás után" data-en="After stopping">Leállítás után</b><span data-hu="Végső kontroll 3–6 hónapon belül." data-en="Final check within 3–6 months.">Végső kontroll 3–6 hónapon belül.</span></div>
+              </div>
+              <p class="fen-region-note" data-hu="A jelenlegi EU SmPC-ben a stiripentol melletti csökkentett maximális adag külön DS-keretben szerepel. Ez az oldal szándékosan nem közöl dózisszámítást." data-en="In the current EU SmPC, the reduced maximum dose with stiripentol is framed specifically for DS. This page intentionally provides no dose calculation.">A jelenlegi EU SmPC-ben a stiripentol melletti csökkentett maximális adag külön DS-keretben szerepel. Ez az oldal szándékosan nem közöl dózisszámítást.</p>
+            </div>
+            <div class="fen-region-panel" id="region-us" hidden>
+              <span class="fen-index" data-hu="Amerikai előírás · REMS" data-en="US label · REMS">Amerikai előírás · REMS</span>
+              <div class="fen-monitor-path">
+                <div class="fen-monitor-step"><b data-hu="Kezdés előtt" data-en="Before start">Kezdés előtt</b><span data-hu="Kiindulási echokardiográfia." data-en="Baseline echocardiogram.">Kiindulási echokardiográfia.</span></div>
+                <div class="fen-monitor-step"><b data-hu="Kezelés alatt" data-en="During treatment">Kezelés alatt</b><span data-hu="Echokardiográfia 6 havonta a kezelés teljes ideje alatt." data-en="Echocardiogram every 6 months throughout treatment.">Echokardiográfia 6 havonta a kezelés teljes ideje alatt.</span></div>
+                <div class="fen-monitor-step"><b>REMS</b><span data-hu="Az amerikai kockázatkezelési program követelményei érvényesek." data-en="US risk-management program requirements apply.">Az amerikai kockázatkezelési program követelményei érvényesek.</span></div>
+                <div class="fen-monitor-step"><b data-hu="Leállítás után" data-en="After stopping">Leállítás után</b><span data-hu="Végső kontroll 3–6 hónapon belül." data-en="Final check within 3–6 months.">Végső kontroll 3–6 hónapon belül.</span></div>
+              </div>
+              <p class="fen-region-note" data-hu="Az amerikai előírás a stiripentol + clobazam kombináció melletti módosítást DS-ben és LGS-ben is tárgyalja. Egyéni döntést kizárólag a kezelőcsapat és a hatályos előírás alapján lehet hozni." data-en="The US label discusses adjustment with stiripentol + clobazam in both DS and LGS. Individual decisions belong only to the treating team using the current label.">Az amerikai előírás a stiripentol + clobazam kombináció melletti módosítást DS-ben és LGS-ben is tárgyalja. Egyéni döntést kizárólag a kezelőcsapat és a hatályos előírás alapján lehet hozni.</p>
+            </div>
+          </div>
+
+          <div class="fen-card fen-safety-stack fen-reveal">
+            <div class="fen-safety-block">
+              <h3 data-hu="Gyakori események" data-en="Common events">Gyakori események</h3>
+              <p data-hu="A vizsgálatokban gyakran leírt események közé tartoztak:" data-en="Events commonly described in trials included:">A vizsgálatokban gyakran leírt események közé tartoztak:</p>
+              <div class="fen-ae-list"><span data-hu="csökkent étvágy" data-en="decreased appetite">csökkent étvágy</span><span data-hu="testsúlycsökkenés" data-en="weight loss">testsúlycsökkenés</span><span data-hu="hasmenés" data-en="diarrhea">hasmenés</span><span data-hu="fáradtság / aluszékonyság" data-en="fatigue / somnolence">fáradtság / aluszékonyság</span></div>
+            </div>
+            <div class="fen-safety-block">
+              <h3 data-hu="Szívbillentyűk és PAH" data-en="Valves and PAH">Szívbillentyűk és PAH</h3>
+              <p data-hu="A kontrollált vizsgálatokban nem észleltek valvulopathiát vagy pulmonális artériás hipertóniát; forgalomba hozatal utáni eseteket azonban jelentettek. A kockázat ezért nem tekinthető nullának." data-en="No valvular disease or pulmonary arterial hypertension was observed in controlled trials; postmarketing cases have nevertheless been reported. Risk should therefore not be treated as zero.">A kontrollált vizsgálatokban nem észleltek valvulopathiát vagy pulmonális artériás hipertóniát; forgalomba hozatal utáni eseteket azonban jelentettek. A kockázat ezért nem tekinthető nullának.</p>
+            </div>
+            <div class="fen-safety-block">
+              <h3 data-hu="Interakciók" data-en="Interactions">Interakciók</h3>
+              <p data-hu="A MAO-gátlókkal való együttes alkalmazás ellenjavallt; a 14 napos elkülönítési szabály és az egyéb interakciók klinikusi ellenőrzést igényelnek." data-en="Concomitant use with MAO inhibitors is contraindicated; the 14-day separation rule and other interactions require clinician review.">A MAO-gátlókkal való együttes alkalmazás ellenjavallt; a 14 napos elkülönítési szabály és az egyéb interakciók klinikusi ellenőrzést igényelnek.</p>
+              <div class="fen-safety-alert" data-hu="Ez nem teljes biztonsági lista. Ne módosíts gyógyszert ezen oldal alapján." data-en="This is not a complete safety list. Do not change medication based on this page.">Ez nem teljes biztonsági lista. Ne módosíts gyógyszert ezen oldal alapján.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="fen-section" id="limits" aria-labelledby="limits-title">
+      <div class="fen-wrap">
+        <header class="fen-section__head fen-reveal">
+          <div>
+            <span class="fen-index" data-hu="04 · Bizonytalansági tér" data-en="04 · Uncertainty map">04 · Bizonytalansági tér</span>
+            <h2 id="limits-title" data-hu="Mit nem mond a bizonyíték?" data-en="What does the evidence not say?">Mit nem mond a bizonyíték?</h2>
+          </div>
+          <p class="fen-section__intro" data-hu="A pontos értelmezéshez nemcsak az eredményeket, hanem a bizonyíték határait is látni kell." data-en="Accurate interpretation requires seeing not only the findings, but also the boundaries of the evidence.">A pontos értelmezéshez nemcsak az eredményeket, hanem a bizonyíték határait is látni kell.</p>
+        </header>
+        <div class="fen-limit-grid fen-reveal">
+          <article class="fen-limit"><span>01</span><h3 data-hu="Narratív áttekintés" data-en="Narrative review">Narratív áttekintés</h3><p data-hu="Nem szisztematikus áttekintés és nem metaanalízis; a tanulmányok kiválasztása és szintézise narratív." data-en="This is neither a systematic review nor a meta-analysis; study selection and synthesis are narrative.">Nem szisztematikus áttekintés és nem metaanalízis; a tanulmányok kiválasztása és szintézise narratív.</p></article>
+          <article class="fen-limit"><span>02</span><h3 data-hu="Rövid RCT-k" data-en="Short RCTs">Rövid RCT-k</h3><p data-hu="A pivotal kontrollált szakaszok 14–15 hetesek voltak; hosszú távú kontrollált adatot nem adnak." data-en="Pivotal controlled periods lasted 14–15 weeks; they do not provide long-term controlled evidence.">A pivotal kontrollált szakaszok 14–15 hetesek voltak; hosszú távú kontrollált adatot nem adnak.</p></article>
+          <article class="fen-limit"><span>03</span><h3 data-hu="Nyílt követés" data-en="Open-label follow-up">Nyílt követés</h3><p data-hu="A kiterjesztések kontrollcsoport nélküliek, és az idővel csökkenő mintanagyság torzíthatja a késői becsléseket." data-en="Extensions lack control groups, and declining sample size over time may bias later estimates.">A kiterjesztések kontrollcsoport nélküliek, és az idővel csökkenő mintanagyság torzíthatja a késői becsléseket.</p></article>
+          <article class="fen-limit"><span>04</span><h3 data-hu="Mechanisztikus rés" data-en="Mechanistic gap">Mechanisztikus rés</h3><p data-hu="A mechanizmus jelentős része preklinikai bizonyítékokon alapul; a pontos humán antikonvulzív útvonal nem teljesen ismert." data-en="Much mechanistic evidence is preclinical; the exact human antiseizure pathway remains incompletely understood.">A mechanizmus jelentős része preklinikai bizonyítékokon alapul; a pontos humán antikonvulzív útvonal nem teljesen ismert.</p></article>
+          <article class="fen-limit"><span>05</span><h3 data-hu="Adathiányok" data-en="Evidence gaps">Adathiányok</h3><p data-hu="Korlátozottak a felnőttadatok és a közvetlen, fej-fej melletti összehasonlítások." data-en="Adult data and direct head-to-head comparisons remain limited.">Korlátozottak a felnőttadatok és a közvetlen, fej-fej melletti összehasonlítások.</p></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="fen-section" id="source" aria-labelledby="source-title">
+      <div class="fen-wrap">
+        <div class="fen-source fen-reveal">
+          <div>
+            <span class="fen-index" data-hu="Eredeti publikáció" data-en="Original publication">Eredeti publikáció</span>
+            <h2 id="source-title" data-hu="Olvasd el a teljes cikket." data-en="Read the full article.">Olvasd el a teljes cikket.</h2>
+            <cite>Janszky J, Janszky J Jr, Horváth R. Fenfluramine for seizures in Dravet syndrome and Lennox–Gastaut syndrome: Mechanisms, clinical evidence, safety, and practical integration.</cite>
+            <p class="fen-source__meta"><em>Epilepsy &amp; Behavior Reports.</em> 2026;35:100876. Published online 4 June 2026.</p>
+          </div>
+          <div class="fen-source__links" role="navigation" aria-label="Forráslinkek" data-aria-hu="Forráslinkek" data-aria-en="Source links">
+            <a class="fen-chip" href="https://doi.org/10.1016/j.ebr.2026.100876" target="_blank" rel="noopener">DOI</a>
+            <a class="fen-chip" href="https://pmc.ncbi.nlm.nih.gov/articles/PMC13320519/" target="_blank" rel="noopener" data-hu="Teljes szöveg · PMC" data-en="Full text · PMC">Teljes szöveg · PMC</a>
+            <a class="fen-chip" href="https://pubmed.ncbi.nlm.nih.gov/42389070/" target="_blank" rel="noopener">PubMed</a>
+            <a class="fen-chip" href="https://m2.mtmt.hu/gui2/?mode=browse&amp;params=publication;37332714" target="_blank" rel="noopener">MTMT · 37332714</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="fen-footer">
+    <div class="fen-wrap fen-footer__inner">
+      <a class="fen-back" href="../../" data-hu="Vissza a szakmai profilhoz" data-en="Back to professional profile">Vissza a szakmai profilhoz</a>
+      <span data-hu="Interaktív kutatási összefoglaló · frissítve: 2026. július" data-en="Interactive research summary · updated July 2026">Interaktív kutatási összefoglaló · frissítve: 2026. július</span>
+    </div>
+  </footer>
+
+  <script src="../shared/research.js" defer></script>
+  <script>
+    window.PAGE_I18N = {
+      hu: { title: 'Fenfluramin · Interaktív kutatási összefoglaló' },
+      en: { title: 'Fenfluramine · Interactive research summary' }
+    };
+    (() => {
+      const copy = {
+        hu: {
+          title: 'Fenfluramin · Interaktív kutatási összefoglaló',
+          contexts: {
+            ds1: 'Dravet-szindróma · konvulzív rohamok',
+            ds2: 'Dravet-szindróma · stiripentol-háttér',
+            lgs: 'Lennox–Gastaut-szindróma · drop rohamok'
+          },
+          mechanisms: {
+            core: ['Kettős mechanisztikus keret', 'A szerotonerg jelátvitel fokozása és a sigma‑1 receptor pozitív modulációja együtt alkotja a jelenlegi keretet.'],
+            '5ht1d': ['5‑HT1D receptor', 'A szabályozói leírásokban a szerotonerg hatás egyik kiemelt receptor-komponense.'],
+            '5ht2a': ['5‑HT2A receptor', 'A fokozott szerotonerg transzmisszió receptorhálózatának egyik kiemelt eleme.'],
+            '5ht2c': ['5‑HT2C receptor', 'A szerotonerg jelátviteli keret fontos eleme; a teljes humán antikonvulzív útvonal továbbra sem tisztázott.'],
+            sigma: ['Sigma‑1 receptor', 'A fenfluramin pozitív modulátorként hat a sigma‑1 receptoron; a bizonyíték jelentős része preklinikai.'],
+            nor: ['Norfenfluramin', 'Az aktív metabolit hozzájárul a farmakológiai hatáshoz, különösen a szerotonerg komponenshez.']
+          }
+        },
+        en: {
+          title: 'Fenfluramine · Interactive research summary',
+          contexts: {
+            ds1: 'Dravet syndrome · convulsive seizures',
+            ds2: 'Dravet syndrome · stiripentol background',
+            lgs: 'Lennox–Gastaut syndrome · drop seizures'
+          },
+          mechanisms: {
+            core: ['Dual mechanistic framework', 'Enhanced serotonergic transmission and positive modulation of the sigma‑1 receptor form the current framework together.'],
+            '5ht1d': ['5‑HT1D receptor', 'One highlighted receptor component of serotonergic action in regulatory descriptions.'],
+            '5ht2a': ['5‑HT2A receptor', 'A highlighted element within the receptor network of enhanced serotonergic transmission.'],
+            '5ht2c': ['5‑HT2C receptor', 'An important part of the serotonergic framework; the full human antiseizure pathway remains unresolved.'],
+            sigma: ['Sigma‑1 receptor', 'Fenfluramine acts as a positive modulator at sigma‑1; much of the evidence is preclinical.'],
+            nor: ['Norfenfluramine', 'The active metabolite contributes to pharmacologic activity, especially its serotonergic component.']
+          }
+        }
+      };
+
+      let lang = 'hu';
+      try { lang = localStorage.getItem('lang') === 'en' ? 'en' : 'hu'; } catch (error) {}
+      let activeMechanism = 'core';
+
+      const applyLanguage = (next) => {
+        lang = next === 'en' ? 'en' : 'hu';
+        try { localStorage.setItem('lang', lang); } catch (error) {}
+        document.documentElement.lang = lang;
+        document.title = copy[lang].title;
+        document.querySelectorAll('[data-hu][data-en]').forEach((node) => {
+          node.textContent = node.dataset[lang];
+        });
+        document.querySelectorAll('[data-aria-hu][data-aria-en]').forEach((node) => {
+          node.setAttribute('aria-label', node.dataset['aria' + (lang === 'hu' ? 'Hu' : 'En')]);
+        });
+        document.querySelectorAll('[data-fen-lang]').forEach((button) => {
+          button.setAttribute('aria-pressed', String(button.dataset.fenLang === lang));
+        });
+        const currentTab = document.querySelector('.fen-tab[aria-selected="true"]');
+        if (currentTab) document.getElementById('trialContext').textContent = copy[lang].contexts[currentTab.dataset.trial];
+        setMechanism(activeMechanism);
+      };
+
+      const setMechanism = (key) => {
+        activeMechanism = key;
+        document.querySelectorAll('[data-mech]').forEach((node) => node.setAttribute('aria-pressed', String(node.dataset.mech === key)));
+        const item = copy[lang].mechanisms[key];
+        document.getElementById('mechTitle').textContent = item[0];
+        document.getElementById('mechText').textContent = item[1];
+      };
+
+      document.querySelectorAll('[data-fen-lang]').forEach((button) => button.addEventListener('click', () => applyLanguage(button.dataset.fenLang)));
+      document.querySelectorAll('[data-mech]').forEach((button) => button.addEventListener('click', () => setMechanism(button.dataset.mech)));
+      document.addEventListener('research:language', (event) => {
+        if (event.detail && event.detail.lang !== lang) applyLanguage(event.detail.lang);
+      });
+
+      document.querySelectorAll('.fen-tab').forEach((tab) => {
+        tab.addEventListener('click', () => {
+          document.querySelectorAll('.fen-tab').forEach((item) => {
+            item.setAttribute('aria-selected', 'false');
+            item.setAttribute('tabindex', '-1');
+          });
+          document.querySelectorAll('.fen-trial-panel').forEach((panel) => { panel.hidden = true; });
+          tab.setAttribute('aria-selected', 'true');
+          tab.removeAttribute('tabindex');
+          document.getElementById('panel-' + tab.dataset.trial).hidden = false;
+          document.getElementById('trialContext').textContent = copy[lang].contexts[tab.dataset.trial];
+        });
+        tab.addEventListener('keydown', (event) => {
+          if (!['ArrowLeft', 'ArrowRight'].includes(event.key)) return;
+          event.preventDefault();
+          const tabs = [...document.querySelectorAll('.fen-tab')];
+          const delta = event.key === 'ArrowRight' ? 1 : -1;
+          tabs[(tabs.indexOf(tab) + delta + tabs.length) % tabs.length].click();
+          tabs[(tabs.indexOf(tab) + delta + tabs.length) % tabs.length].focus();
+        });
+      });
+
+      document.querySelectorAll('.fen-filter').forEach((button) => {
+        button.addEventListener('click', () => {
+          const filter = button.dataset.filter;
+          document.querySelectorAll('.fen-filter').forEach((item) => item.setAttribute('aria-pressed', String(item === button)));
+          document.querySelectorAll('.fen-time-card').forEach((card) => {
+            card.classList.toggle('is-muted', filter !== 'all' && card.dataset.kind !== filter && card.dataset.kind !== 'both');
+          });
+        });
+      });
+
+      document.querySelectorAll('.fen-region').forEach((button) => {
+        button.addEventListener('click', () => {
+          document.querySelectorAll('.fen-region').forEach((item) => item.setAttribute('aria-pressed', String(item === button)));
+          document.querySelectorAll('.fen-region-panel').forEach((panel) => { panel.hidden = panel.id !== 'region-' + button.dataset.region; });
+        });
+      });
+
+      const motionButton = document.getElementById('fenMotion');
+      motionButton.addEventListener('click', () => {
+        const paused = document.body.classList.toggle('motion-paused');
+        motionButton.setAttribute('aria-pressed', String(paused));
+        motionButton.setAttribute('aria-label', paused
+          ? (lang === 'hu' ? 'Animáció folytatása' : 'Resume animation')
+          : (lang === 'hu' ? 'Animáció szüneteltetése' : 'Pause animation'));
+      });
+
+      const reveal = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => { if (entry.isIntersecting) entry.target.classList.add('is-visible'); });
+      }, { threshold: .08 });
+      document.querySelectorAll('.fen-reveal').forEach((node) => reveal.observe(node));
+
+      const progress = document.getElementById('fenProgress');
+      const updateProgress = () => {
+        const length = document.documentElement.scrollHeight - innerHeight;
+        progress.style.transform = 'scaleX(' + (length > 0 ? scrollY / length : 0) + ')';
+      };
+      addEventListener('scroll', updateProgress, { passive: true });
+      updateProgress();
+      applyLanguage(lang);
+    })();
+  </script>
+</body>
+</html>
