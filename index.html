@@ -329,6 +329,7 @@
         <a href="#affiliations" data-i18n="nav_affiliations">Intézményi háttér</a>
         <a href="#interests" data-i18n="nav_interests">Kutatási témák</a>
         <a href="#projects" data-i18n="nav_projects">Kutatásaim vizuális reprezentációja</a>
+        <a href="#applications" data-i18n="nav_applications">Alkalmazások</a>
         <a href="#methods" data-i18n="nav_methods">Módszertan</a>
         <a href="#contact" data-i18n="nav_contact">Kapcsolat</a>
       </nav>
@@ -393,6 +394,12 @@
         <p style="margin-top:10px" data-i18n="projects_note"></p>
       </article>
 
+      <article class="card wide" id="applications">
+        <h2 data-i18n="applications_title">Alkalmazások</h2>
+        <ul class="publication-list" data-i18n-html="applications_list"></ul>
+        <p style="margin-top:10px" data-i18n="applications_note"></p>
+      </article>
+
       <article class="card wide" id="methods">
         <h2 data-i18n="methods_title">Módszertan & eszközök</h2>
         <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 12px;">
@@ -428,6 +435,7 @@
         nav_affiliations: "Intézményi háttér",
         nav_interests: "Kutatási témák",
         nav_projects: "Kutatásaim vizuális reprezentációja",
+        nav_applications: "Alkalmazások",
         nav_methods: "Módszertan",
         nav_contact: "Kapcsolat",
 
@@ -488,6 +496,15 @@
         `,
         projects_note: ``,
 
+        applications_title: "Alkalmazások",
+        applications_list: `
+          <li class="publication-item">
+            <a class="publication-title" href="https://mindcivilis-atlas.joe328.chatgpt.site" target="_blank" rel="noopener">MindCivilis – interaktív identitásatlasz</a>
+            <div class="publication-links"><span>23 kérdőív · EN/HU/DE · menthető és összehasonlítható profilok</span></div>
+          </li>
+        `,
+        applications_note: "A MindCivilis privacy-first működésű: a válaszok és a mentett profilok alapértelmezetten a saját eszközön maradnak, automatikus feltöltés nincs. A kutatási hozzájárulás és a kutatási célú export külön, opcionális döntés; az alkalmazás kutatási részvétel nélkül is teljesen használható.",
+
         methods_title: "Módszertan & eszközök",
         methods_p1: "Adatkezelés és elemzés:",
         methods_list1: `
@@ -521,6 +538,7 @@
         nav_affiliations: "Affiliations",
         nav_interests: "Research",
         nav_projects: "Research visuals",
+        nav_applications: "Applications",
         nav_methods: "Methods",
         nav_contact: "Contact",
 
@@ -580,6 +598,15 @@
           <li class="publication-item secondary-project"><a class="publication-title" href="https://janszkyjozsef.github.io/Posztikt-lis-Hiperzexualit-s-az-Epilepszi-ban/" target="_blank" rel="noopener">Additional research visual: Postictal hypersexuality</a></li>
         `,
         projects_note: ``,
+
+        applications_title: "Applications",
+        applications_list: `
+          <li class="publication-item">
+            <a class="publication-title" href="https://mindcivilis-atlas.joe328.chatgpt.site" target="_blank" rel="noopener">MindCivilis – interactive identity atlas</a>
+            <div class="publication-links"><span>23 questionnaires · EN/HU/DE · saveable and comparable profiles</span></div>
+          </li>
+        `,
+        applications_note: "MindCivilis is privacy-first: responses and saved profiles stay on your device by default, with no automatic upload. Research contribution and research export are separate, optional choices; the app remains fully usable without research participation.",
 
         methods_title: "Methods & tools",
         methods_p1: "Data handling & analysis:",
